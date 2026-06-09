@@ -1,0 +1,57 @@
+/* Scroll hero extras: se usa dentro de index.html via in-line <style> insertado manualmente si se desea.
+   Actualmente lo dejamos para referencia futura; si quieres, lo integro en el index.html. */
+
+.scroll-chip{
+  position:absolute;
+  bottom:1.5rem;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:3;
+  width:min(980px,92vw);
+  pointer-events:none;
+  opacity:0.9;
+}
+
+.scroll-chip-track{
+  display:flex;
+  gap:0.75rem;
+  white-space:nowrap;
+  overflow:hidden;
+  padding:0.75rem 0;
+  mask-image:linear-gradient(90deg, transparent 0%, #000 12%, #000 88%, transparent 100%);
+}
+
+.scroll-chip-track span{
+  display:inline-flex;
+  align-items:center;
+  padding:0.55rem 0.9rem;
+  border-radius:999px;
+  font-size:0.72rem;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  background:rgba(5,5,5,0.55);
+  border:1px solid rgba(255,77,26,0.18);
+  color:var(--gold);
+  backdrop-filter:blur(10px);
+  box-shadow:0 12px 40px rgba(255,77,26,0.08);
+  animation:chip-float 7s var(--ease-smooth) infinite;
+}
+
+.scroll-chip-track span:nth-child(odd){
+  animation-duration:9s;
+}
+
+/* Rotación sutil por scroll usando un pseudo-estado via translateY con CSS (parallax real lo hace JS del template). */
+.hero-bg--scroll{
+  will-change:transform;
+}
+
+@keyframes chip-float{
+  0%,100%{ transform:translateY(0px); }
+  50%{ transform:translateY(-6px); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .scroll-chip-track span{ animation:none; }
+}
+
