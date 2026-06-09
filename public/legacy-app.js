@@ -233,23 +233,89 @@ const CATALOG_DESCRIPTIONS = {
 // =========================================
 // DATA LOADING
 // =========================================
+function getPrimaryImage(product) {
+  const images = (product.product_images || []).slice().sort((a, b) => a.sort_order - b.sort_order);
+  return images[0]?.url || "";
+}
+
+function inferVehicleSubtype(product) {
+  const m = product.metadata || {};
+  if (m.vehicle_type === "moto" || m.vehicle_type === "carro") return m.vehicle_type;
+  if (m.subtype === "moto" || m.subtype === "carro") return m.subtype;
+  const text = `${product.name} ${product.description || ""}`.toLowerCase();
+  if (/(carro|auto|suv|sed[aá]n|camioneta|pickup|4x4)/.test(text)) return "carro";
+  return "moto";
+}
+
+function mapProductToVehicle(product) {
+  const m = product.metadata || {};
+  return {
+    id: product.id,
+    name: product.name,
+    category: m.category || "general",
+    type: inferVehicleSubtype(product),
+    purpose: m.purpose === "alquiler" ? "alquiler" : "venta",
+    year: m.year || new Date().getFullYear(),
+    mileage: m.mileage || m.kilometraje || "Consultar",
+    price: product.price || "",
+    image: getPrimaryImage(product),
+  };
+}
+
+function mapProductToGold(product) {
+  const m = product.metadata || {};
+  return {
+    id: product.id,
+    name: product.name,
+    karats: m.karats || m.kilate || m.quilates || "Consultar",
+    weight: m.weight || m.peso || m.medidas || "Consultar",
+    price: product.price || "",
+    image: getPrimaryImage(product),
+  };
+}
+
+function mapProductToTramite(product) {
+  const m = product.metadata || {};
+  const defaultWa = `Hola Harry, necesito información sobre ${product.name}. ¿Me puedes ayudar?`;
+  return {
+    id: product.id,
+    name: product.name,
+    description: product.description || "",
+    icon: m.icon || "📄",
+    btn_label: m.btn_label || m.button_label || "Consultar",
+    wa_message: m.wa_message || m.whatsapp_message || defaultWa,
+  };
+}
+
+function mapProductToExchangeRate(product) {
+  const m = product.metadata || {};
+  const currency = m.currency || m.code || product.name;
+  return {
+    id: product.id,
+    currency,
+    name: m.currency_name || m.name || product.name,
+    icon: m.icon || "💱",
+    buy_rate: m.buy_rate || product.price || "Consultar",
+    sell_rate: m.sell_rate || product.description || m.buy_rate || product.price || "Consultar",
+    updated_label: m.updated_label || "Actualizado hoy",
+  };
+}
+
 async function loadData() {
   if (usingSupabase && supabaseClient) {
     try {
-      const [vRes, gRes, tRes, eRes] = await Promise.all([
-        supabaseClient.from("vehicles").select("*"),
-        supabaseClient.from("gold_items").select("*"),
-        supabaseClient.from("tramite_services").select("*"),
-        supabaseClient.from("exchange_rates").select("*")
-      ]);
+      const { data, error } = await supabaseClient
+        .from("products")
+        .select("*, product_images(*)")
+        .eq("status", "publicado");
 
-      if (vRes.error) throw vRes.error;
-      if (gRes.error) throw gRes.error;
+      if (error) throw error;
 
-      vehicles = vRes.data || [];
-      goldItems = gRes.data || [];
-      tramiteServices = tRes.error ? LOCAL_TRAMITES : (tRes.data || LOCAL_TRAMITES);
-      exchangeRates = eRes.error ? LOCAL_EXCHANGE_RATES : (eRes.data?.length ? eRes.data : LOCAL_EXCHANGE_RATES);
+      const products = data || [];
+      vehicles = products.filter((p) => p.type === "vehiculo").map(mapProductToVehicle);
+      goldItems = products.filter((p) => p.type === "oro").map(mapProductToGold);
+      tramiteServices = products.filter((p) => p.type === "tramite").map(mapProductToTramite);
+      exchangeRates = products.filter((p) => p.type === "divisa").map(mapProductToExchangeRate);
     } catch (err) {
       console.warn("Supabase fetch failed, using local data:", err);
       vehicles = LOCAL_VEHICLES;
