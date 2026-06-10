@@ -16,14 +16,41 @@ function frameSrc(index: number) {
   return `/hero-sequence/${String(index + 1).padStart(5, "0")}.png`;
 }
 
-/** object-fit: cover — llena viewport sin bandas negras */
-function getFrameScale(
+/** Escala y encuadre según dispositivo y fase de la animación (llanta vs logo) */
+function getFrameLayout(
   viewportW: number,
   viewportH: number,
   imgW: number,
-  imgH: number
+  imgH: number,
+  frameIndex: number
 ) {
-  return Math.max(viewportW / imgW, viewportH / imgH);
+  const frameT = frameIndex / Math.max(FRAME_COUNT - 1, 1);
+  const coverScale = Math.max(viewportW / imgW, viewportH / imgH);
+  const containScale = Math.min(viewportW / imgW, viewportH / imgH);
+  const isPortrait = viewportH > viewportW * 1.05;
+
+  let scale = coverScale;
+  let focusX = 0.5;
+  let focusY = 0.5;
+
+  if (isPortrait) {
+    const logoPhase = Math.min(Math.max((frameT - 0.65) / 0.35, 0), 1);
+    const smokePhase = Math.min(Math.max((frameT - 0.12) / 0.55, 0), 1) * (1 - logoPhase);
+
+    scale = coverScale * (1 - logoPhase) + containScale * logoPhase;
+    focusX = 0.5 + smokePhase * 0.08 - logoPhase * 0;
+    focusY = 0.5;
+  } else {
+    const logoPhase = Math.min(Math.max((frameT - 0.72) / 0.28, 0), 1);
+    scale = coverScale * (1 - logoPhase * 0.35) + containScale * (logoPhase * 0.35);
+  }
+
+  const drawW = imgW * scale;
+  const drawH = imgH * scale;
+  const x = viewportW * focusX - drawW * focusX;
+  const y = viewportH * focusY - drawH * focusY;
+
+  return { drawW, drawH, x, y };
 }
 
 function snapToCatalog() {
@@ -61,29 +88,43 @@ export default function HomeHero() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const pin = pinRef.current;
+    const w = pin?.clientWidth || canvas.clientWidth;
+    const h = pin?.clientHeight || canvas.clientHeight;
+    if (w <= 0 || h <= 0) return;
+
     const dpr = window.devicePixelRatio || 1;
-    const w = canvas.clientWidth;
-    const h = canvas.clientHeight;
 
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
 
-    const scale = getFrameScale(w, h, img.naturalWidth, img.naturalHeight);
-    const drawW = img.naturalWidth * scale;
-    const drawH = img.naturalHeight * scale;
-    const x = (w - drawW) / 2;
-    const y = (h - drawH) / 2;
+    const { drawW, drawH, x, y } = getFrameLayout(
+      w,
+      h,
+      img.naturalWidth,
+      img.naturalHeight,
+      clamped
+    );
 
     ctx.drawImage(img, x, y, drawW, drawH);
+  }, []);
+
+  const getViewportSize = useCallback(() => {
+    const pin = pinRef.current;
+    if (pin) {
+      return { w: pin.clientWidth, h: pin.clientHeight };
+    }
+    return { w: window.innerWidth, h: window.innerHeight };
   }, []);
 
   const resizeCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    const { w, h } = getViewportSize();
+    if (w <= 0 || h <= 0) return;
+
     const dpr = window.devicePixelRatio || 1;
-    const w = canvas.clientWidth;
-    const h = canvas.clientHeight;
 
     canvas.width = Math.round(w * dpr);
     canvas.height = Math.round(h * dpr);
@@ -93,7 +134,7 @@ export default function HomeHero() {
     if (lastFrame >= 0) {
       drawFrame(lastFrame);
     }
-  }, [drawFrame]);
+  }, [drawFrame, getViewportSize]);
 
   useLayoutEffect(() => {
     if (!rootRef.current || !pinRef.current || !canvasRef.current) return;
