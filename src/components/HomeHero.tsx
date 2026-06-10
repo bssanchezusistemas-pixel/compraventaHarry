@@ -16,7 +16,10 @@ function frameSrc(index: number) {
   return `/hero-sequence/${String(index + 1).padStart(5, "0")}.png`;
 }
 
-/** Escala y encuadre según dispositivo y fase de la animación (llanta vs logo) */
+const MOBILE_ZOOM = 1.12;
+const MOBILE_LOGO_START = 0.68;
+
+/** Compromiso móvil: contain + zoom; logo final a 100% sin recorte */
 function getFrameLayout(
   viewportW: number,
   viewportH: number,
@@ -25,30 +28,29 @@ function getFrameLayout(
   frameIndex: number
 ) {
   const frameT = frameIndex / Math.max(FRAME_COUNT - 1, 1);
-  const coverScale = Math.max(viewportW / imgW, viewportH / imgH);
   const containScale = Math.min(viewportW / imgW, viewportH / imgH);
+  const coverScale = Math.max(viewportW / imgW, viewportH / imgH);
   const isPortrait = viewportH > viewportW * 1.05;
 
-  let scale = coverScale;
-  let focusX = 0.5;
-  let focusY = 0.5;
+  let scale: number;
 
   if (isPortrait) {
-    const logoPhase = Math.min(Math.max((frameT - 0.65) / 0.35, 0), 1);
-    const smokePhase = Math.min(Math.max((frameT - 0.12) / 0.55, 0), 1) * (1 - logoPhase);
-
-    scale = coverScale * (1 - logoPhase) + containScale * logoPhase;
-    focusX = 0.5 + smokePhase * 0.08 - logoPhase * 0;
-    focusY = 0.5;
+    const logoPhase = Math.min(
+      Math.max((frameT - MOBILE_LOGO_START) / (1 - MOBILE_LOGO_START), 0),
+      1
+    );
+    const zoom = MOBILE_ZOOM * (1 - logoPhase) + logoPhase;
+    scale = containScale * zoom;
+    scale = Math.min(scale, coverScale * 0.995);
   } else {
     const logoPhase = Math.min(Math.max((frameT - 0.72) / 0.28, 0), 1);
-    scale = coverScale * (1 - logoPhase * 0.35) + containScale * (logoPhase * 0.35);
+    scale = coverScale * (1 - logoPhase * 0.2) + containScale * (logoPhase * 0.2);
   }
 
   const drawW = imgW * scale;
   const drawH = imgH * scale;
-  const x = viewportW * focusX - drawW * focusX;
-  const y = viewportH * focusY - drawH * focusY;
+  const x = (viewportW - drawW) / 2;
+  const y = (viewportH - drawH) / 2;
 
   return { drawW, drawH, x, y };
 }
