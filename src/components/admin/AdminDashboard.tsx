@@ -16,24 +16,111 @@ import {
   revokePreviewUrl,
   type PreviewImage,
 } from "@/lib/image-process";
-import type { DashboardStats, Product, ProductStatus, ProductType } from "@/lib/types";
-import {
-  PRODUCT_STATUSES,
-  PRODUCT_TYPES,
-  STATUS_LABELS,
-  TYPE_LABELS,
-} from "@/lib/types";
+import type { DashboardStats, Product, ProductType } from "@/lib/types";
+import { TYPE_LABELS } from "@/lib/types";
 
 type Toast = { id: string; message: string; type: "success" | "error" };
+type VehicleType = "moto" | "carro";
+type ProductCategory = "moto" | "carro" | "oro" | "repuestos" | "accesorios" | "alquiler";
+
+const CATEGORY_OPTIONS: { value: ProductCategory; label: string }[] = [
+  { value: "moto", label: "Moto" },
+  { value: "carro", label: "Carro" },
+  { value: "oro", label: "Oro" },
+  { value: "repuestos", label: "Repuestos" },
+  { value: "accesorios", label: "Accesorios" },
+  { value: "alquiler", label: "Alquiler (moto o carro)" },
+];
+
+const CC_OPTIONS = ["110", "125", "150", "200", "250", "300", "650", "other"] as const;
+const TRANSMISSION_OPTIONS = ["Manual", "Automática"] as const;
+const FUEL_OPTIONS = ["Gasolina", "Diésel", "Híbrido", "Eléctrico"] as const;
 
 const emptyForm = {
   id: "" as string | undefined,
   name: "",
-  type: "vehiculo" as ProductType,
-  status: "borrador" as ProductStatus,
+  category: "moto" as ProductCategory,
+  vehicleType: "moto" as VehicleType,
   price: "",
   description: "",
+  brand: "",
+  modelYear: "",
+  kilometers: "",
+  paperUntil: "",
+  cc: "",
+  transmission: "",
+  fuel: "",
 };
+
+function isVehicleCategory(category: ProductCategory): boolean {
+  return category === "moto" || category === "carro" || category === "alquiler";
+}
+
+function resolveVehicleType(form: typeof emptyForm): VehicleType {
+  if (form.category === "carro") return "carro";
+  if (form.category === "moto") return "moto";
+  return form.vehicleType;
+}
+
+function resolveProductType(category: ProductCategory): ProductType {
+  if (category === "oro") return "oro";
+  if (category === "repuestos" || category === "accesorios") return "servicio";
+  return "vehiculo";
+}
+
+function buildMetadata(form: typeof emptyForm): Record<string, unknown> {
+  if (form.category === "oro") {
+    return {};
+  }
+
+  if (form.category === "repuestos" || form.category === "accesorios") {
+    const metadata: Record<string, unknown> = { category: form.category };
+    if (form.brand.trim()) metadata.brand = form.brand.trim();
+    return metadata;
+  }
+
+  const vehicleType = resolveVehicleType(form);
+  const metadata: Record<string, unknown> = {
+    vehicle_type: vehicleType,
+    purpose: form.category === "alquiler" ? "alquiler" : "venta",
+  };
+
+  if (form.brand.trim()) metadata.brand = form.brand.trim();
+  if (form.modelYear) metadata.model_year = Number(form.modelYear);
+  if (form.kilometers) metadata.kilometers = Number(form.kilometers);
+  if (form.paperUntil.trim()) metadata.paper_until = form.paperUntil.trim();
+
+  if (vehicleType === "moto" && form.cc) {
+    metadata.cc = form.cc;
+  }
+
+  if (vehicleType === "carro") {
+    if (form.transmission) metadata.transmission = form.transmission;
+    if (form.fuel) metadata.fuel = form.fuel;
+  }
+
+  return metadata;
+}
+
+function inferCategory(product: Product): ProductCategory {
+  const m = product.metadata || {};
+
+  if (product.type === "oro") return "oro";
+  if (product.type === "servicio") {
+    if (m.category === "accesorios") return "accesorios";
+    return "repuestos";
+  }
+  if (product.type === "vehiculo" && m.purpose === "alquiler") return "alquiler";
+  if (m.vehicle_type === "carro") return "carro";
+  return "moto";
+}
+
+function productCategoryLabel(product: Product): string {
+  const category = inferCategory(product);
+  const option = CATEGORY_OPTIONS.find((o) => o.value === category);
+  if (option) return option.label;
+  return TYPE_LABELS[product.type];
+}
 
 export default function AdminDashboard() {
   const [supabase] = useState(() => createClient());
@@ -84,13 +171,22 @@ export default function AdminDashboard() {
   };
 
   const openEdit = (product: Product) => {
+    const m = product.metadata || {};
+    const category = inferCategory(product);
     setForm({
       id: product.id,
       name: product.name,
-      type: product.type,
-      status: product.status,
+      category,
+      vehicleType: m.vehicle_type === "carro" ? "carro" : "moto",
       price: product.price || "",
       description: product.description || "",
+      brand: typeof m.brand === "string" ? m.brand : "",
+      modelYear: m.model_year != null ? String(m.model_year) : "",
+      kilometers: m.kilometers != null ? String(m.kilometers) : "",
+      paperUntil: typeof m.paper_until === "string" ? m.paper_until : "",
+      cc: typeof m.cc === "string" ? m.cc : "",
+      transmission: typeof m.transmission === "string" ? m.transmission : "",
+      fuel: typeof m.fuel === "string" ? m.fuel : "",
     });
     previews.forEach((p) => revokePreviewUrl(p.previewUrl));
     setPreviews([]);
@@ -157,11 +253,11 @@ export default function AdminDashboard() {
         {
           id: form.id,
           name: form.name.trim(),
-          type: form.type,
-          status: form.status,
+          type: resolveProductType(form.category),
+          status: "publicado",
           price: form.price,
           description: form.description,
-          metadata: {},
+          metadata: buildMetadata(form),
         },
         previews.map((p) => p.file)
       );
@@ -186,20 +282,6 @@ export default function AdminDashboard() {
       await load();
     } catch (e) {
       toast(e instanceof Error ? e.message : "Error al eliminar", "error");
-    }
-  };
-
-  const publishProduct = async (product: Product) => {
-    try {
-      const { error } = await supabase
-        .from("products")
-        .update({ status: "publicado" })
-        .eq("id", product.id);
-      if (error) throw error;
-      toast("Producto publicado");
-      await load();
-    } catch (e) {
-      toast(e instanceof Error ? e.message : "Error al publicar", "error");
     }
   };
 
@@ -281,7 +363,6 @@ export default function AdminDashboard() {
                     <th>Imagen</th>
                     <th>Nombre</th>
                     <th>Tipo</th>
-                    <th>Estado</th>
                     <th className="admin-hide-mobile">Precio</th>
                     <th className="admin-hide-mobile">Fecha</th>
                     <th>Acciones</th>
@@ -298,20 +379,12 @@ export default function AdminDashboard() {
                         )}
                       </td>
                       <td>{p.name}</td>
-                      <td>{TYPE_LABELS[p.type]}</td>
-                      <td>
-                        <span className={`admin-badge admin-badge--${p.status}`}>
-                          {STATUS_LABELS[p.status]}
-                        </span>
-                      </td>
+                      <td>{productCategoryLabel(p)}</td>
                       <td className="admin-hide-mobile">{p.price || "—"}</td>
                       <td className="admin-hide-mobile">{formatDate(p.created_at)}</td>
                       <td>
                         <div style={{ display: "flex", gap: "0.35rem", flexWrap: "wrap" }}>
                           <button type="button" className="admin-btn" onClick={() => openEdit(p)}>Editar</button>
-                          {p.status !== "publicado" && (
-                            <button type="button" className="admin-btn" onClick={() => publishProduct(p)}>Publicar</button>
-                          )}
                           <button type="button" className="admin-btn admin-btn--danger" onClick={() => setDeleteTarget(p)}>Eliminar</button>
                         </div>
                       </td>
@@ -352,21 +425,143 @@ export default function AdminDashboard() {
                 <input id="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
               </div>
               <div className="admin-field">
-                <label htmlFor="type">Tipo</label>
-                <select id="type" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as ProductType })}>
-                  {PRODUCT_TYPES.map((t) => (
-                    <option key={t} value={t}>{TYPE_LABELS[t]}</option>
+                <label htmlFor="category">Categoría</label>
+                <select
+                  id="category"
+                  value={form.category}
+                  onChange={(e) =>
+                    setForm({ ...form, category: e.target.value as ProductCategory })
+                  }
+                >
+                  {CATEGORY_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
                   ))}
                 </select>
+              </div>
+              {form.category === "alquiler" && (
+                <div className="admin-field">
+                  <label htmlFor="vehicleType">Vehículo en alquiler</label>
+                  <select
+                    id="vehicleType"
+                    value={form.vehicleType}
+                    onChange={(e) =>
+                      setForm({ ...form, vehicleType: e.target.value as VehicleType })
+                    }
+                  >
+                    <option value="moto">Moto</option>
+                    <option value="carro">Carro</option>
+                  </select>
+                </div>
+              )}
+              {isVehicleCategory(form.category) && (
+                <>
+              <div className="admin-field">
+                <label htmlFor="brand">Marca</label>
+                <input
+                  id="brand"
+                  value={form.brand}
+                  onChange={(e) => setForm({ ...form, brand: e.target.value })}
+                  placeholder="Yamaha, Suzuki, Toyota…"
+                />
               </div>
               <div className="admin-field">
-                <label htmlFor="status">Estado</label>
-                <select id="status" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value as ProductStatus })}>
-                  {PRODUCT_STATUSES.map((s) => (
-                    <option key={s} value={s}>{STATUS_LABELS[s]}</option>
-                  ))}
-                </select>
+                <label htmlFor="modelYear">Modelo (año)</label>
+                <input
+                  id="modelYear"
+                  type="number"
+                  min={1980}
+                  max={2100}
+                  value={form.modelYear}
+                  onChange={(e) => setForm({ ...form, modelYear: e.target.value })}
+                  placeholder="2022"
+                />
               </div>
+              <div className="admin-field">
+                <label htmlFor="kilometers">Kilómetros</label>
+                <input
+                  id="kilometers"
+                  type="number"
+                  min={0}
+                  value={form.kilometers}
+                  onChange={(e) => setForm({ ...form, kilometers: e.target.value })}
+                  placeholder="12500"
+                />
+              </div>
+              <div className="admin-field">
+                <label htmlFor="paperUntil">Papeles hasta</label>
+                <input
+                  id="paperUntil"
+                  value={form.paperUntil}
+                  onChange={(e) => setForm({ ...form, paperUntil: e.target.value })}
+                  placeholder="Marzo 2027"
+                />
+              </div>
+              {(form.category === "moto" || (form.category === "alquiler" && form.vehicleType === "moto")) && (
+                <div className="admin-field">
+                  <label htmlFor="cc">Cilindraje</label>
+                  <select
+                    id="cc"
+                    value={form.cc}
+                    onChange={(e) => setForm({ ...form, cc: e.target.value })}
+                  >
+                    <option value="">Seleccionar…</option>
+                    {CC_OPTIONS.map((cc) => (
+                      <option key={cc} value={cc}>
+                        {cc === "other" ? "Otro" : cc}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              {(form.category === "carro" || (form.category === "alquiler" && form.vehicleType === "carro")) && (
+                <>
+                  <div className="admin-field">
+                    <label htmlFor="transmission">Transmisión</label>
+                    <select
+                      id="transmission"
+                      value={form.transmission}
+                      onChange={(e) => setForm({ ...form, transmission: e.target.value })}
+                    >
+                      <option value="">Seleccionar…</option>
+                      {TRANSMISSION_OPTIONS.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="admin-field">
+                    <label htmlFor="fuel">Combustible</label>
+                    <select
+                      id="fuel"
+                      value={form.fuel}
+                      onChange={(e) => setForm({ ...form, fuel: e.target.value })}
+                    >
+                      <option value="">Seleccionar…</option>
+                      {FUEL_OPTIONS.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              )}
+                </>
+              )}
+              {(form.category === "repuestos" || form.category === "accesorios") && (
+                <div className="admin-field">
+                  <label htmlFor="brand">Marca</label>
+                  <input
+                    id="brand"
+                    value={form.brand}
+                    onChange={(e) => setForm({ ...form, brand: e.target.value })}
+                    placeholder="Marca o compatibilidad…"
+                  />
+                </div>
+              )}
               <div className="admin-field">
                 <label htmlFor="price">Precio</label>
                 <input id="price" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="$17.400.000" />

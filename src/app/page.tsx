@@ -1,3 +1,4 @@
+import HomeHero from "@/components/HomeHero";
 import LegacyStubLink from "@/components/LegacyStubLink";
 
 export default function PreviewPage() {
@@ -45,20 +46,7 @@ export default function PreviewPage() {
         </div>
       </header>
 
-      {/* ─── HERO (Sticky Video Scroll) ────────────────────────── */}
-      <section className="hero" id="hero" aria-label="Hero Video">
-        <div className="hero-video-wrap">
-          <video className="hero-video" autoPlay loop muted playsInline preload="auto">
-            <source src="/hero.mp4" type="video/mp4" />
-          </video>
-        </div>
-        <div className="hero-overlay" />
-
-        <div className="hero-scroll-cue" aria-hidden="true">
-          <span>Desliza hacia abajo</span>
-          <div className="hero-scroll-arrow" />
-        </div>
-      </section>
+      <HomeHero />
 
       {/* ─── MAIN CONTENT (slides over hero) ───────────────────── */}
       <main className="main-content" id="catalogo">

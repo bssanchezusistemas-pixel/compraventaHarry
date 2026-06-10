@@ -659,6 +659,15 @@ function refreshAllGrids() {
 // =========================================
 // SCROLL & UI EFFECTS
 // =========================================
+function getHeroScrollProgress() {
+  const scene = document.getElementById("heroScrollScene");
+  if (!scene) return 0;
+  const scrollable = scene.offsetHeight - window.innerHeight;
+  if (scrollable <= 0) return 0;
+  const scrolled = Math.min(Math.max(-scene.getBoundingClientRect().top, 0), scrollable);
+  return scrolled / scrollable;
+}
+
 function handleScrollEffects(scrollY) {
   const windowHeight = window.innerHeight;
 
@@ -676,12 +685,40 @@ function handleScrollEffects(scrollY) {
     navbar.classList.toggle("navbar--scrolled", scrollY > 50);
   }
 
-  // 3. Hero video scroll zoom
-  const heroVideoWrap = document.querySelector(".hero-video-wrap");
-  if (heroVideoWrap) {
-    const ratio = Math.min(scrollY / windowHeight, 1);
-    heroVideoWrap.style.transform = `scale(${1 - ratio * 0.15})`;
-    heroVideoWrap.style.opacity = 1 - ratio;
+  // 3. Hero scroll scene — llanta, logo, video (scrub al scroll)
+  const p = getHeroScrollProgress();
+  const llanta = document.getElementById("heroLlanta");
+  const logo = document.getElementById("heroLogo");
+  const videoWrap = document.getElementById("heroVideoWrap");
+  const overlay = document.getElementById("heroOverlay");
+  const cue = document.getElementById("heroScrollCue");
+
+  if (llanta && logo) {
+    const tireP = Math.min(p / 0.7, 1);
+    const tireX = 28 - tireP * 56;
+    const tireRot = tireP * -120;
+
+    const logoOpacity = Math.min(Math.max((p - 0.08) / 0.42, 0), 1);
+    const mergeP = Math.min(Math.max((p - 0.45) / 0.55, 0), 1);
+    const logoX = 32 * (1 - mergeP);
+    const logoScale = 0.55 + mergeP * 0.45;
+
+    llanta.style.transform = `translate(calc(-50% + ${tireX}vw), -50%) rotate(${tireRot}deg)`;
+    logo.style.opacity = String(logoOpacity);
+    logo.style.transform = `translate(calc(-50% + ${logoX}vw), -50%) scale(${logoScale})`;
+  }
+
+  if (videoWrap) {
+    videoWrap.style.transform = `scale(${1 - p * 0.2}) translateY(${p * -30}px)`;
+    videoWrap.style.opacity = String(1 - p * 0.65);
+  }
+
+  if (overlay) {
+    overlay.style.opacity = String(0.85 + p * 0.15);
+  }
+
+  if (cue) {
+    cue.style.opacity = p > 0.15 ? String(Math.max(0, 0.75 - p * 1.2)) : "0.75";
   }
 
   // 4. Reveal elements
