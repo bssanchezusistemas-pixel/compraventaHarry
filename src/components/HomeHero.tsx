@@ -11,25 +11,18 @@ const FRAME_COUNT = 240;
 const FRAME_END_PROGRESS = 0.9;
 const LOGO_HOLD_PROGRESS = 0.96;
 const FADE_START_PROGRESS = 0.96;
-const MOBILE_BREAKPOINT = 768;
-const MOBILE_SCALE_BOOST = 1.1;
 
 function frameSrc(index: number) {
   return `/hero-sequence/${String(index + 1).padStart(5, "0")}.png`;
 }
 
+/** object-fit: cover — llena viewport sin bandas negras */
 function getFrameScale(
   viewportW: number,
   viewportH: number,
   imgW: number,
   imgH: number
 ) {
-  const isMobile = viewportW <= MOBILE_BREAKPOINT;
-
-  if (isMobile) {
-    return Math.min(viewportW / imgW, viewportH / imgH) * MOBILE_SCALE_BOOST;
-  }
-
   return Math.max(viewportW / imgW, viewportH / imgH);
 }
 
@@ -195,11 +188,13 @@ export default function HomeHero() {
   return (
     <section ref={rootRef} className="home-hero" id="hero" aria-label="Hero">
       <div ref={pinRef} className="home-hero__pin">
-        <canvas
-          ref={canvasRef}
-          className="home-hero__canvas"
-          aria-label="Animación de llanta Compraventa Harry"
-        />
+        <div className="home-hero__media" aria-hidden="true">
+          <canvas
+            ref={canvasRef}
+            className="home-hero__canvas"
+            aria-label="Animación de llanta Compraventa Harry"
+          />
+        </div>
 
         {!loaded && (
           <div className="home-hero__loader" aria-hidden="true">
@@ -209,7 +204,7 @@ export default function HomeHero() {
 
         <div ref={overlayRef} className="home-hero__fade" aria-hidden="true" />
 
-        <div ref={cueRef} className="hero-scroll-cue" aria-hidden="true">
+        <div ref={cueRef} className="hero-scroll-cue home-hero__cue" aria-hidden="true">
           <span>Desliza hacia abajo</span>
           <div className="hero-scroll-arrow" />
         </div>
