@@ -11,9 +11,26 @@ const FRAME_COUNT = 240;
 const FRAME_END_PROGRESS = 0.9;
 const LOGO_HOLD_PROGRESS = 0.96;
 const FADE_START_PROGRESS = 0.96;
+const MOBILE_BREAKPOINT = 768;
+const MOBILE_SCALE_BOOST = 1.1;
 
 function frameSrc(index: number) {
   return `/hero-sequence/${String(index + 1).padStart(5, "0")}.png`;
+}
+
+function getFrameScale(
+  viewportW: number,
+  viewportH: number,
+  imgW: number,
+  imgH: number
+) {
+  const isMobile = viewportW <= MOBILE_BREAKPOINT;
+
+  if (isMobile) {
+    return Math.min(viewportW / imgW, viewportH / imgH) * MOBILE_SCALE_BOOST;
+  }
+
+  return Math.max(viewportW / imgW, viewportH / imgH);
 }
 
 function snapToCatalog() {
@@ -58,7 +75,7 @@ export default function HomeHero() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
 
-    const scale = Math.min(w / img.naturalWidth, h / img.naturalHeight);
+    const scale = getFrameScale(w, h, img.naturalWidth, img.naturalHeight);
     const drawW = img.naturalWidth * scale;
     const drawH = img.naturalHeight * scale;
     const x = (w - drawW) / 2;
@@ -78,8 +95,10 @@ export default function HomeHero() {
     canvas.width = Math.round(w * dpr);
     canvas.height = Math.round(h * dpr);
 
-    if (currentFrameRef.current >= 0) {
-      drawFrame(currentFrameRef.current);
+    const lastFrame = currentFrameRef.current;
+    currentFrameRef.current = -1;
+    if (lastFrame >= 0) {
+      drawFrame(lastFrame);
     }
   }, [drawFrame]);
 
