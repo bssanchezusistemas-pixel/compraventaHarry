@@ -138,33 +138,68 @@ const LOCAL_TRAMITES = [
     name: "SOAT",
     description: "Seguro Obligatorio de Accidentes de Tránsito. Cotización rápida y gestión sin filas.",
     icon: "🛡️",
-    btn_label: "Cotizar mi SOAT",
-    wa_message: "Hola Harry, necesito cotizar el SOAT de mi vehículo. ¿Me ayudas con el proceso?"
+    image: "",
+    image_placeholder: true,
+    requirement: "Foto de la tarjeta de propiedad de la moto",
+    btn_label: "Cotizar SOAT",
+    wa_message:
+      "Hola Harry, necesito cotizar el SOAT de mi moto. Adjunto foto de la tarjeta de propiedad. ¿Me ayudas con el proceso?",
   },
   {
     id: 2,
     name: "Tecnomecánica",
-    description: "Revisión técnico-mecánica y de emisiones. Agenda tu cita con nosotros.",
+    description: "Revisión técnico-mecánica y de emisiones contaminantes.",
     icon: "🔧",
+    price: "$220.000",
     btn_label: "Agendar Tecno",
-    wa_message: "Hola Harry, necesito agendar la revisión tecnomecánica de mi vehículo. ¿Cuándo tienen disponibilidad?"
+    wa_message:
+      "Hola Harry, necesito agendar la revisión tecnomecánica de mi vehículo. ¿Cuándo tienen disponibilidad?",
   },
   {
     id: 3,
     name: "Impuestos",
     description: "Liquidación de impuestos departamentales y municipales del año en curso.",
     icon: "💰",
+    image: "",
+    image_placeholder: true,
+    requirement: "Foto de la tarjeta de propiedad de la moto",
     btn_label: "Liquidar Impuestos",
-    wa_message: "Hola Harry, necesito ayuda para liquidar los impuestos de mi vehículo. ¿Me puedes asesorar?"
+    wa_message:
+      "Hola Harry, necesito ayuda para liquidar los impuestos de mi moto. Adjunto foto de la tarjeta de propiedad. ¿Me puedes asesorar?",
   },
   {
     id: 4,
-    name: "Matrículas / Duplicados / Improntas",
-    description: "Duplicados de tarjeta de propiedad, matrículas e improntas vehiculares.",
+    name: "Improntas",
+    description: "Toma de improntas de chasis y motor con entrega ágil para trámites vehiculares.",
+    icon: "🔍",
+    btn_label: "Solicitar Improntas",
+    wa_message: "Hola Harry, necesito tomar improntas de mi vehículo. ¿Me puedes orientar sobre el proceso y el costo?",
+  },
+  {
+    id: 5,
+    name: "Traspasos",
+    description: "Gestión completa del traspaso de propiedad de motos y carros.",
+    icon: "🔄",
+    btn_label: "Iniciar Traspaso",
+    wa_message:
+      "Hola Harry, necesito hacer el traspaso de mi vehículo. ¿Qué documentos debo tener listos y cuánto demora el trámite?",
+  },
+  {
+    id: 6,
+    name: "Matrículas",
+    description: "Trámite de matrícula inicial o renovación con acompañamiento personalizado.",
+    icon: "🪪",
+    btn_label: "Consultar Matrícula",
+    wa_message: "Hola Harry, necesito información sobre un trámite de matrícula. ¿Me puedes ayudar?",
+  },
+  {
+    id: 7,
+    name: "Duplicados",
+    description: "Duplicado de tarjeta de propiedad y documentos vehiculares.",
     icon: "📋",
-    btn_label: "Consultar Trámite",
-    wa_message: "Hola Harry, necesito información sobre un trámite de matrícula, duplicado o improntas. ¿Me puedes orientar?"
-  }
+    btn_label: "Solicitar Duplicado",
+    wa_message: "Hola Harry, necesito un duplicado de tarjeta de propiedad. ¿Cuál es el proceso y el valor?",
+  },
 ];
 
 const LOCAL_EXCHANGE_RATES = [
@@ -219,6 +254,7 @@ const LOCAL_GOLD = [
 let vehicles = [];
 let goldItems = [];
 let tramiteServices = [];
+let repuestosItems = [];
 let exchangeRates = [];
 
 const CATALOG_DESCRIPTIONS = {
@@ -226,8 +262,9 @@ const CATALOG_DESCRIPTIONS = {
   carros: "Vehículos de cuatro ruedas disponibles para compra inmediata.",
   oro: "Compraventa de oro con cotización al precio real del mercado.",
   divisas: "Compra y venta de dólares y euros con tasas competitivas del día.",
-  tramites: "Trámites vehiculares, SOAT, tecnomecánica, impuestos y documentación.",
-  alquiler: "Alquiler de motos y carros — mínimo 5 días de renta."
+  tramites: "SOAT, tecnomecánica, impuestos, improntas, traspasos, matrículas y duplicados.",
+  repuestos: "Repuestos y accesorios para motos y carros — consulta disponibilidad por WhatsApp.",
+  alquiler: "Alquiler de motos y carros — mínimo 5 días de renta.",
 };
 
 // =========================================
@@ -282,8 +319,26 @@ function mapProductToTramite(product) {
     name: product.name,
     description: product.description || "",
     icon: m.icon || "📄",
+    image: getPrimaryImage(product),
+    image_placeholder: Boolean(m.image_placeholder),
+    requirement: m.requirement || m.requisito || "",
+    price: product.price || m.price || "",
     btn_label: m.btn_label || m.button_label || "Consultar",
     wa_message: m.wa_message || m.whatsapp_message || defaultWa,
+  };
+}
+
+function mapProductToRepuesto(product) {
+  const m = product.metadata || {};
+  const category = m.category === "accesorios" ? "accesorios" : "repuestos";
+  return {
+    id: product.id,
+    name: product.name,
+    category,
+    brand: m.brand || "",
+    description: product.description || "",
+    price: product.price || "Consultar",
+    image: getPrimaryImage(product),
   };
 }
 
@@ -315,18 +370,23 @@ async function loadData() {
       vehicles = products.filter((p) => p.type === "vehiculo").map(mapProductToVehicle);
       goldItems = products.filter((p) => p.type === "oro").map(mapProductToGold);
       tramiteServices = products.filter((p) => p.type === "tramite").map(mapProductToTramite);
+      repuestosItems = products.filter((p) => p.type === "servicio").map(mapProductToRepuesto);
       exchangeRates = products.filter((p) => p.type === "divisa").map(mapProductToExchangeRate);
+
+      if (tramiteServices.length === 0) tramiteServices = LOCAL_TRAMITES;
     } catch (err) {
       console.warn("Supabase fetch failed, using local data:", err);
       vehicles = LOCAL_VEHICLES;
       goldItems = LOCAL_GOLD;
       tramiteServices = LOCAL_TRAMITES;
+      repuestosItems = [];
       exchangeRates = LOCAL_EXCHANGE_RATES;
     }
   } else {
     vehicles = LOCAL_VEHICLES;
     goldItems = LOCAL_GOLD;
     tramiteServices = LOCAL_TRAMITES;
+    repuestosItems = [];
     exchangeRates = LOCAL_EXCHANGE_RATES;
   }
 }
@@ -400,15 +460,72 @@ function buildGoldCard(item) {
 function buildTramiteCard(service) {
   const waUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(service.wa_message)}`;
 
+  const imageBlock = service.image
+    ? `<div class="tramite-service-image"><img src="${service.image}" alt="${service.name}" loading="lazy"></div>`
+    : service.image_placeholder
+      ? `<div class="tramite-service-image tramite-service-image--placeholder"><span class="tramite-service-image-icon" aria-hidden="true">📷</span><p>Espacio para imagen</p></div>`
+      : "";
+
+  const priceBlock = service.price
+    ? `<div class="tramite-service-price"><span class="tramite-service-price-label">Valor</span><strong>${service.price}</strong></div>`
+    : "";
+
+  const requirementBlock = service.requirement
+    ? `<p class="tramite-service-requirement"><strong>Requisito:</strong> ${service.requirement}</p>`
+    : "";
+
+  const iconBlock =
+    !service.image && !service.image_placeholder
+      ? `<div class="tramite-service-icon">${service.icon || "📄"}</div>`
+      : "";
+
   const card = document.createElement("article");
   card.className = "tramite-service-card reveal active";
   card.innerHTML = `
-    <div class="tramite-service-icon">${service.icon || "📄"}</div>
+    ${imageBlock}
+    ${iconBlock}
     <h3 class="tramite-service-title">${service.name}</h3>
     <p class="tramite-service-desc">${service.description || ""}</p>
+    ${requirementBlock}
+    ${priceBlock}
     <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="btn-tramite-service">
       ${service.btn_label || "Consultar"}
     </a>
+  `;
+  return card;
+}
+
+function buildRepuestoCard(item) {
+  const categoryLabel = item.category === "accesorios" ? "Accesorio" : "Repuesto";
+  const msg = `¡Hola Harry! Estoy interesado en ${item.name}${item.brand ? ` (${item.brand})` : ""} del catálogo de repuestos y accesorios. ¿Está disponible?`;
+  const waUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(msg)}`;
+
+  const card = document.createElement("article");
+  card.className = "catalog-card reveal active";
+  card.innerHTML = `
+    <div class="card-img-wrap">
+      <div class="card-overlay"></div>
+      ${
+        item.image
+          ? `<img src="${item.image}" alt="${item.name}" loading="lazy">`
+          : `<div class="card-img-placeholder"><span>🔧</span><p>Sin imagen</p></div>`
+      }
+    </div>
+    <div class="card-body">
+      <h3 class="card-title">${item.name}</h3>
+      <div class="card-specs">
+        <span class="spec-badge">${categoryLabel}</span>
+        ${item.brand ? `<span class="spec-badge">${item.brand}</span>` : ""}
+      </div>
+      ${item.description ? `<p class="card-static-subtitle">${item.description}</p>` : ""}
+      <div class="card-price-wrap">
+        <span class="price-label">Precio</span>
+        <span class="price-tag">${item.price}</span>
+      </div>
+      <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="btn-card">
+        Consultar Disponibilidad
+      </a>
+    </div>
   `;
   return card;
 }
@@ -538,10 +655,24 @@ function renderTramites() {
   tramiteServices.forEach(s => grid.appendChild(buildTramiteCard(s)));
 }
 
+function renderRepuestos() {
+  const grid = document.getElementById("repuestosGrid");
+  if (!grid) return;
+
+  grid.innerHTML = "";
+
+  if (repuestosItems.length === 0) {
+    showEmpty(grid, "No hay repuestos ni accesorios disponibles en este momento. Escríbenos por WhatsApp.");
+    return;
+  }
+
+  repuestosItems.forEach(item => grid.appendChild(buildRepuestoCard(item)));
+}
+
 // =========================================
 // CATALOG MENU NAVIGATION
 // =========================================
-const VALID_TABS = ["motos", "carros", "oro", "divisas", "tramites", "alquiler"];
+const VALID_TABS = ["motos", "carros", "oro", "divisas", "tramites", "repuestos", "alquiler"];
 let activeTab = "motos";
 
 function updateCatalogDescription(tabId) {
@@ -651,6 +782,9 @@ function refreshAllGrids() {
 
   const tramitesGrid = document.getElementById("tramitesGrid");
   if (tramitesGrid) { tramitesGrid.innerHTML = ""; renderTramites(); }
+
+  const repuestosGrid = document.getElementById("repuestosGrid");
+  if (repuestosGrid) { repuestosGrid.innerHTML = ""; renderRepuestos(); }
 
   const divisasGrid = document.getElementById("divisasRatesGrid");
   if (divisasGrid) { divisasGrid.innerHTML = ""; renderDivisas(); }
@@ -787,6 +921,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderOro();
   renderDivisas();
   renderTramites();
+  renderRepuestos();
   renderAlquiler();
 
   // 4. Tab navigation

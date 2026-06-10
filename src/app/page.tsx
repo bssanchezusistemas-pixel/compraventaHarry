@@ -1,10 +1,497 @@
-﻿import HomeHero from "@/components/HomeHero";
+import HomeHero from "@/components/HomeHero";
 import LegacyStubLink from "@/components/LegacyStubLink";
 
 export default function PreviewPage() {
   return (
     <>
       <div className="scroll-progress" aria-hidden="true" />
+
+      {/* ─── NAVBAR ─────────────────────────────────────────────── */}
+      <header className="navbar" id="navbar" role="banner">
+        <div className="nav-inner">
+          <a href="#" className="logo">
+            Compraventa <span>Harry</span>
+          </a>
+
+          <nav className="nav-links" id="navLinks" aria-label="Navegación principal">
+            <a href="#hero">Inicio</a>
+            <a href="#catalogo">Catálogo</a>
+            <a href="#contacto">Contacto</a>
+            <a href="/admin" className="nav-admin-btn">
+              Admin ⚙️
+            </a>
+          </nav>
+
+          <a
+            href="https://wa.me/573127622440?text=%C2%A1Hola%20Harry!%20Quiero%20m%C3%A1s%20informaci%C3%B3n%20sobre%20sus%20servicios."
+            className="nav-cta"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Escríbenos
+          </a>
+
+          <button
+            className="menu-toggle"
+            id="menuToggle"
+            aria-label="Abrir menú"
+            aria-expanded="false"
+            type="button"
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
+      </header>
+
+      <HomeHero />
+
+      {/* ─── MAIN CONTENT (slides over hero) ───────────────────── */}
+      <main className="main-content" id="catalogo">
+        <div className="catalog-page" id="catalogPage">
+          <header className="catalog-page-header">
+            <p className="section-label">Nuestros Servicios</p>
+            <h1 className="catalog-page-title">Catálogo Completo</h1>
+            <p className="catalog-page-desc" id="catalogPageDesc">
+              Motos, carros, oro, divisas, trámites, repuestos y alquiler — todo en un solo lugar.
+            </p>
+          </header>
+
+          <button
+            className="catalog-mobile-toggle"
+            id="catalogMobileToggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="catalogSidebar"
+          >
+            <span className="catalog-mobile-toggle-icon" aria-hidden="true">
+              ☰
+            </span>
+            <span id="catalogMobileToggleText">Menú Catálogo</span>
+          </button>
+
+          <div className="catalog-layout">
+            <aside className="catalog-sidebar" id="catalogSidebar">
+              <div className="catalog-sidebar-header">
+                <span className="catalog-sidebar-title">Categorías</span>
+              </div>
+              <nav
+                className="catalog-menu"
+                id="catalogMenu"
+                role="tablist"
+                aria-label="Categorías del catálogo"
+              >
+                <button
+                  className="catalog-menu-btn active"
+                  data-tab="motos"
+                  role="tab"
+                  aria-selected="true"
+                  aria-controls="panel-motos"
+                  type="button"
+                >
+                  🏍️ Motos
+                </button>
+                <button
+                  className="catalog-menu-btn"
+                  data-tab="carros"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="panel-carros"
+                  type="button"
+                >
+                  🚗 Carros
+                </button>
+                <button
+                  className="catalog-menu-btn"
+                  data-tab="oro"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="panel-oro"
+                  type="button"
+                >
+                  ✨ Oro
+                </button>
+                <button
+                  className="catalog-menu-btn"
+                  data-tab="divisas"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="panel-divisas"
+                  type="button"
+                >
+                  💵 Dólares y Euros
+                </button>
+                <button
+                  className="catalog-menu-btn"
+                  data-tab="tramites"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="panel-tramites"
+                  type="button"
+                >
+                  📄 Trámites y Papeles
+                </button>
+                <button
+                  className="catalog-menu-btn"
+                  data-tab="repuestos"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="panel-repuestos"
+                  type="button"
+                >
+                  🔧 Repuestos y Accesorios
+                </button>
+                <button
+                  className="catalog-menu-btn"
+                  data-tab="alquiler"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="panel-alquiler"
+                  type="button"
+                >
+                  🔑 Alquiler
+                </button>
+              </nav>
+            </aside>
+
+            <div className="catalog-main">
+              <div className="tab-panels-min-height" id="tabPanelsWrap">
+                {/* ── PANEL: MOTOS ──────────────────────────────────── */}
+                <section
+                  className="tab-panel active"
+                  id="panel-motos"
+                  role="tabpanel"
+                  aria-labelledby="tab-motos"
+                >
+                  <div className="catalog-container">
+                    <header className="section-header">
+                      <p className="section-label">Dos Ruedas</p>
+                      <h2 className="section-title">Catálogo de Motos</h2>
+                    </header>
+
+                    <div className="catalog-grid" id="motosGrid">
+                      <article className="catalog-card catalog-card--static">
+                        <div className="card-img-wrap">
+                          <div className="card-overlay" />
+                          <img
+                            src="/Gemini_Generated_Image_h0jrkah0jrkah0jr.png"
+                            alt="Vende tu moto con Harry"
+                            loading="eager"
+                          />
+                          <span className="card-badge-static">Servicio Directo</span>
+                        </div>
+                        <div className="card-body">
+                          <h3 className="card-title">¿Quieres vender tu Moto? Directo a Harry</h3>
+                          <p className="card-static-subtitle">
+                            Envíanos los siguientes datos para una cotización inmediata:
+                          </p>
+                          <ul className="card-bullets">
+                            <li>
+                              <span>✓</span> Fotos reales
+                            </li>
+                            <li>
+                              <span>✓</span> Precio pretendido
+                            </li>
+                            <li>
+                              <span>✓</span> Modelo / Año
+                            </li>
+                            <li>
+                              <span>✓</span> Estado de Impuestos
+                            </li>
+                            <li>
+                              <span>✓</span> Kilometraje actual
+                            </li>
+                            <li>
+                              <span>✓</span> Placa (¿De dónde es?)
+                            </li>
+                            <li>
+                              <span>✓</span> SOAT (¿Hasta cuándo?)
+                            </li>
+                            <li>
+                              <span>✓</span> Tecno (¿Hasta cuándo?)
+                            </li>
+                          </ul>
+                          <a
+                            href="https://wa.me/573127622440?text=Hola%20Harry%2C%20quiero%20vender%20mi%20moto.%20Aqu%C3%AD%20tengo%20las%20fotos%2C%20precio%2C%20modelo%2C%20info%20de%20impuestos%2C%20kilometraje%2C%20placas%2C%20y%20vigencia%20de%20SOAT%20y%20Tecno."
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn-card btn-card--static"
+                          >
+                            Enviar Datos por WhatsApp
+                          </a>
+                        </div>
+                      </article>
+                    </div>
+                  </div>
+                </section>
+
+                {/* ── PANEL: CARROS ─────────────────────────────────── */}
+                <section
+                  className="tab-panel"
+                  id="panel-carros"
+                  role="tabpanel"
+                  aria-labelledby="tab-carros"
+                >
+                  <div className="catalog-container">
+                    <header className="section-header">
+                      <p className="section-label">Cuatro Ruedas</p>
+                      <h2 className="section-title">Catálogo de Carros</h2>
+                    </header>
+                    <div className="catalog-grid" id="carrosGrid" />
+                  </div>
+                </section>
+
+                {/* ── PANEL: ORO Y DIVISAS ──────────────────────────── */}
+                <section
+                  className="tab-panel"
+                  id="panel-oro"
+                  role="tabpanel"
+                  aria-labelledby="tab-oro"
+                >
+                  <div className="catalog-container">
+                    <header className="section-header">
+                      <p className="section-label">Metales Preciosos</p>
+                      <h2 className="section-title">Compraventa de Oro</h2>
+                    </header>
+
+                    <div className="oro-layout">
+                      <div className="oro-sell-card">
+                        <div className="oro-sell-image-wrap">
+                          <div className="oro-sell-overlay" />
+                          <span className="oro-sell-badge">Compra Premium</span>
+                          <h3 className="oro-sell-title-overlay">Compramos tu Oro al mejor precio</h3>
+                        </div>
+                        <div className="oro-sell-body">
+                          <p className="oro-sell-desc">
+                            Envíanos los datos de tu pieza y recibe una oferta competitiva basada en el
+                            precio real del mercado:
+                          </p>
+                          <ul className="card-bullets">
+                            <li>
+                              <span>⚡</span> Fotos nítidas de la pieza
+                            </li>
+                            <li>
+                              <span>⚡</span> Color del oro
+                            </li>
+                            <li>
+                              <span>⚡</span> Precio estimado
+                            </li>
+                            <li>
+                              <span>⚡</span> Kilates
+                            </li>
+                            <li>
+                              <span>⚡</span> Centímetros / Medidas
+                            </li>
+                          </ul>
+                          <a
+                            href="https://wa.me/573127622440?text=Hola%20Harry%2C%20quiero%20vender%20una%20pieza%20de%20oro.%20Tengo%20listos%20los%20datos%3A%20fotos%2C%20color%2C%20precio%2C%20kilates%20y%20cent%C3%ADmetros."
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn-card"
+                          >
+                            Cotizar mi Oro
+                          </a>
+                        </div>
+                      </div>
+
+                      <div className="oro-buy-wrap">
+                        <h3 className="oro-buy-subtitle">Piezas Disponibles</h3>
+                        <div className="oro-buy-grid" id="oroGrid" />
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* ── PANEL: DIVISAS (USD / EUR) ───────────────────── */}
+                <section
+                  className="tab-panel"
+                  id="panel-divisas"
+                  role="tabpanel"
+                  aria-labelledby="tab-divisas"
+                >
+                  <div className="catalog-container">
+                    <header className="section-header">
+                      <p className="section-label">Cambio de Divisas</p>
+                      <h2 className="section-title">Compra y Venta de Dólares y Euros</h2>
+                    </header>
+
+                    <div className="divisas-disclaimer">
+                      <span className="divisas-disclaimer-icon" aria-hidden="true">
+                        📊
+                      </span>
+                      <p>
+                        Tasas referenciales del día. La cotización final se confirma por WhatsApp según
+                        monto, moneda y disponibilidad.
+                      </p>
+                    </div>
+
+                    <div className="divisas-rates-grid" id="divisasRatesGrid" />
+
+                    <div className="divisas-actions-grid">
+                      <article className="divisa-action-card">
+                        <div className="divisa-action-icon">💵</div>
+                        <h3>Comprar Divisas</h3>
+                        <p>
+                          Adquiere dólares o euros con atención personalizada, proceso ágil y entrega
+                          segura.
+                        </p>
+                        <ul className="card-bullets">
+                          <li>
+                            <span>✓</span> Moneda deseada (USD o EUR)
+                          </li>
+                          <li>
+                            <span>✓</span> Monto a comprar en pesos colombianos
+                          </li>
+                          <li>
+                            <span>✓</span> Forma de pago y ciudad de entrega
+                          </li>
+                        </ul>
+                        <a
+                          href="https://wa.me/573127622440?text=Hola%20Harry%2C%20quiero%20comprar%20divisas%20(d%C3%B3lares%20o%20euros).%20%C2%BFPodr%C3%ADas%20enviarme%20la%20tasa%20del%20d%C3%ADa%20y%20disponibilidad%3F"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn-card btn-card--divisa"
+                        >
+                          Comprar USD / EUR
+                        </a>
+                      </article>
+
+                      <article className="divisa-action-card divisa-action-card--sell">
+                        <div className="divisa-action-icon">💶</div>
+                        <h3>Vender Divisas</h3>
+                        <p>
+                          Vende tus dólares o euros y recibe pesos colombianos al mejor precio del
+                          mercado.
+                        </p>
+                        <ul className="card-bullets">
+                          <li>
+                            <span>✓</span> Tipo de moneda y cantidad en efectivo
+                          </li>
+                          <li>
+                            <span>✓</span> Billetes en buen estado (sin daños)
+                          </li>
+                          <li>
+                            <span>✓</span> Documento de identidad vigente
+                          </li>
+                        </ul>
+                        <a
+                          href="https://wa.me/573127622440?text=Hola%20Harry%2C%20quiero%20vender%20mis%20divisas%20(d%C3%B3lares%20o%20euros).%20%C2%BFCu%C3%A1l%20es%20la%20tasa%20de%20compra%20hoy%3F"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn-card btn-card--divisa-sell"
+                        >
+                          Vender mis Divisas
+                        </a>
+                      </article>
+                    </div>
+                  </div>
+                </section>
+
+                {/* ── PANEL: TRÁMITES Y PAPELES ────────────────────── */}
+                <section
+                  className="tab-panel"
+                  id="panel-tramites"
+                  role="tabpanel"
+                  aria-labelledby="tab-tramites"
+                >
+                  <div className="catalog-container">
+                    <header className="section-header">
+                      <p className="section-label">Documentación Vehicular</p>
+                      <h2 className="section-title">Trámites y Papeles</h2>
+                    </header>
+
+                    <div className="tramite-featured-card">
+                      <div className="tramite-featured-header">
+                        <div className="tramite-featured-icon">📋</div>
+                        <div>
+                          <span className="tramite-priority-badge">Requisito Previo</span>
+                          <h3>Traspaso de Vehículo — Documentos que necesitas</h3>
+                        </div>
+                      </div>
+                      <p className="tramite-featured-desc">
+                        Para que Harry pueda gestionar el traspaso de tu vehículo de forma ágil y segura,
+                        debes tener listos los siguientes documentos al momento del proceso:
+                      </p>
+                      <ul className="card-bullets tramite-bullets">
+                        <li>
+                          <span>📌</span> Improntas nítidas (número de chasis y motor)
+                        </li>
+                        <li>
+                          <span>📌</span> Contrato de compraventa firmado por ambas partes
+                        </li>
+                        <li>
+                          <span>📌</span> Paz y salvo de impuestos del año en curso
+                        </li>
+                        <li>
+                          <span>📌</span> SOAT y Tecnicomecánica vigentes en el RUNT
+                        </li>
+                      </ul>
+                      <a
+                        href="https://wa.me/573127622440?text=Hola%20Harry%2C%20necesito%20hacer%20un%20traspaso.%20Ya%20tengo%20listos%20los%20papeles%2C%20improntas%20y%20el%20paz%20y%20salvo%20de%20impuestos."
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-tramite-primary"
+                      >
+                        Iniciar Trámite →
+                      </a>
+                    </div>
+
+                    <div className="tramites-services-header">
+                      <h3 className="oro-buy-subtitle">Servicios Disponibles</h3>
+                    </div>
+                    <div className="tramites-grid" id="tramitesGrid" />
+                  </div>
+                </section>
+
+                {/* ── PANEL: REPUESTOS Y ACCESORIOS ─────────────────── */}
+                <section
+                  className="tab-panel"
+                  id="panel-repuestos"
+                  role="tabpanel"
+                  aria-labelledby="tab-repuestos"
+                >
+                  <div className="catalog-container">
+                    <header className="section-header">
+                      <p className="section-label">Piezas y Complementos</p>
+                      <h2 className="section-title">Repuestos y Accesorios</h2>
+                    </header>
+
+                    <div className="catalog-grid" id="repuestosGrid" />
+                  </div>
+                </section>
+
+                {/* ── PANEL: ALQUILER ───────────────────────────────── */}
+                <section
+                  className="tab-panel"
+                  id="panel-alquiler"
+                  role="tabpanel"
+                  aria-labelledby="tab-alquiler"
+                >
+                  <div className="catalog-container">
+                    <header className="section-header">
+                      <p className="section-label">Renta de Vehículos</p>
+                      <h2 className="section-title">Alquiler de Vehículos</h2>
+                    </header>
+
+                    <div className="rental-warning-box">
+                      <div className="rental-warning-icon">⚠️</div>
+                      <div className="rental-warning-text">
+                        <h3>REQUISITO MÍNIMO DE ALQUILER</h3>
+                        <p>
+                          El tiempo mínimo de alquiler para cualquier vehículo (Moto o Carro) es de{" "}
+                          <strong>5 DÍAS en adelante</strong>. Sin excepciones.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="catalog-grid" id="alquilerGrid" />
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* ── CONTACTO ──────────────────────────────────────── */}
         <section className="contact-section-wrap" id="contacto">
@@ -97,7 +584,7 @@ export default function PreviewPage() {
                 Compraventa <span>Harry</span>
               </div>
               <p>
-                Motos · Carros · Oro · Divisas · Trámites · Alquiler. La plataforma de confianza para tus
+                Motos · Carros · Oro · Divisas · Trámites · Repuestos · Alquiler. La plataforma de confianza para tus
                 operaciones vehiculares, metales y cambio de moneda.
               </p>
               <div className="social-links" aria-label="Redes sociales">
@@ -147,6 +634,11 @@ export default function PreviewPage() {
                   </a>
                 </li>
                 <li>
+                  <a href="#catalogo" data-goto-tab="repuestos">
+                    🔧 Repuestos y Accesorios
+                  </a>
+                </li>
+                <li>
                   <a href="#catalogo" data-goto-tab="alquiler">
                     🔑 Alquiler
                   </a>
@@ -156,7 +648,6 @@ export default function PreviewPage() {
             <div className="footer-col">
               <h4>Información</h4>
               <ul>
-                <li>                </li>
                 <li>
                   <a href="#contacto">Contacto</a>
                 </li>
