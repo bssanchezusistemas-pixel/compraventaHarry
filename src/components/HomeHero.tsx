@@ -13,7 +13,7 @@ const LOGO_HOLD_PROGRESS = 0.96;
 const FADE_START_PROGRESS = 0.96;
 
 function frameSrc(index: number) {
-  return `/hero-sequence/${String(index + 1).padStart(5, "0")}.png`;
+  return `/hero-sequence/${String(index + 1).padStart(5, "0")}.webp`;
 }
 
 const MOBILE_ZOOM = 1.12;
