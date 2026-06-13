@@ -513,7 +513,7 @@ export default function PreviewPage() {
                   </div>
                   <div>
                     <h4>Ubicación</h4>
-                    <p>Medellín, Antioquia — Colombia (Atención Nacional)</p>
+                    <p>Zarzal valle del cauca, carrera 10 #12 64</p>
                   </div>
                 </div>
                 <div className="contact-item">
@@ -565,7 +565,7 @@ export default function PreviewPage() {
             <div className="map-container reveal">
               <iframe
                 title="Ubicación de Compraventa Harry"
-                src="https://www.google.com/maps?q=Medellin,+Colombia&hl=es&z=12&output=embed"
+                src="https://www.google.com/maps?q=Zarzal,+Valle+del+Cauca,+Carrera+10+%2312+64&hl=es&z=12&output=embed"
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
