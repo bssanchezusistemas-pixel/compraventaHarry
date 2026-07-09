@@ -1,21 +1,11 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { getSupabaseConfig } from "./config";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
-
-  if (!url || !key) {
-    if (request.nextUrl.pathname.startsWith("/admin") && !request.nextUrl.pathname.startsWith("/admin/login")) {
-      const loginUrl = request.nextUrl.clone();
-      loginUrl.pathname = "/admin/login";
-      loginUrl.searchParams.set("error", "config");
-      return NextResponse.redirect(loginUrl);
-    }
-    return supabaseResponse;
-  }
+  const { url, key } = getSupabaseConfig();
 
   const supabase = createServerClient(url, key, {
     cookies: {
