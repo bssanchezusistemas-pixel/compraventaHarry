@@ -1,12 +1,17 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { DashboardStats, Product, ProductImage, ProductStatus, ProductType } from "./types";
 
-const BUCKET = "product-images";
+const BUCKET = "cv-product-images";
+// Tablas con prefijo cv_ porque el proyecto Supabase se comparte con otra app.
+// El alias "product_images:cv_product_images" mantiene la forma esperada por los tipos.
+const PRODUCTS_TABLE = "cv_products";
+const IMAGES_TABLE = "cv_product_images";
+const SELECT_WITH_IMAGES = "*, product_images:cv_product_images(*)";
 
 export async function fetchAllProducts(supabase: SupabaseClient): Promise<Product[]> {
   const { data, error } = await supabase
-    .from("products")
-    .select("*, product_images(*)")
+    .from(PRODUCTS_TABLE)
+    .select(SELECT_WITH_IMAGES)
     .order("created_at", { ascending: false });
 
   if (error) throw error;
@@ -21,8 +26,8 @@ export async function fetchAllProducts(supabase: SupabaseClient): Promise<Produc
 
 export async function fetchPublishedProducts(supabase: SupabaseClient): Promise<Product[]> {
   const { data, error } = await supabase
-    .from("products")
-    .select("*, product_images(*)")
+    .from(PRODUCTS_TABLE)
+    .select(SELECT_WITH_IMAGES)
     .eq("status", "publicado")
     .order("created_at", { ascending: false });
 
@@ -61,7 +66,7 @@ export async function uploadProductImages(
     const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(path);
 
     const { data, error } = await supabase
-      .from("product_images")
+      .from(IMAGES_TABLE)
       .insert({
         product_id: productId,
         url: urlData.publicUrl,
@@ -87,7 +92,7 @@ export async function deleteProductWithImages(supabase: SupabaseClient, product:
     await supabase.storage.from(BUCKET).remove(paths);
   }
 
-  const { error } = await supabase.from("products").delete().eq("id", product.id);
+  const { error } = await supabase.from(PRODUCTS_TABLE).delete().eq("id", product.id);
   if (error) throw error;
 }
 
@@ -117,10 +122,10 @@ export async function saveProduct(
   let productId = payload.id;
 
   if (productId) {
-    const { error } = await supabase.from("products").update(row).eq("id", productId);
+    const { error } = await supabase.from(PRODUCTS_TABLE).update(row).eq("id", productId);
     if (error) throw error;
   } else {
-    const { data, error } = await supabase.from("products").insert(row).select().single();
+    const { data, error } = await supabase.from(PRODUCTS_TABLE).insert(row).select().single();
     if (error) throw error;
     productId = data.id;
   }

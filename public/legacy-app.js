@@ -360,8 +360,8 @@ async function loadData() {
   if (usingSupabase && supabaseClient) {
     try {
       const { data, error } = await supabaseClient
-        .from("products")
-        .select("*, product_images(*)")
+        .from("cv_products")
+        .select("*, product_images:cv_product_images(*)")
         .eq("status", "publicado");
 
       if (error) throw error;
