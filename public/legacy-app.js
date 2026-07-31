@@ -92,7 +92,7 @@ const LOCAL_VEHICLES = [
     year: 2026,
     mileage: "0 km",
     price: "$34.500.000",
-    image: "/linea_dirt_dr650.png"
+    image: "/linea_dirt_dr650.webp"
   },
   // MOTOS - ALQUILER
   {
@@ -116,7 +116,7 @@ const LOCAL_VEHICLES = [
     year: 2025,
     mileage: "1.500 km",
     price: "$420.000.000",
-    image: "/Gemini_Generated_Image_vz65j3vz65j3vz65.png"
+    image: "/Gemini_Generated_Image_vz65j3vz65j3vz65.webp"
   },
   // CARROS - ALQUILER
   {
@@ -128,7 +128,7 @@ const LOCAL_VEHICLES = [
     year: 2024,
     mileage: "Disponible",
     price: "$350.000/día",
-    image: "/Gemini_Generated_Image_vz65j3vz65j3vz65.png"
+    image: "/Gemini_Generated_Image_vz65j3vz65j3vz65.webp"
   }
 ];
 
@@ -230,7 +230,7 @@ const LOCAL_GOLD = [
     karats: "18k",
     weight: "12 gr / 60 cm",
     price: "$4.800.000",
-    image: "/Gemini_Generated_Image_h0jrkah0jrkah0jr.png"
+    image: "/vender-moto.webp"
   },
   {
     id: 2,
@@ -238,7 +238,7 @@ const LOCAL_GOLD = [
     karats: "14k",
     weight: "8 gr / 20 cm",
     price: "$2.100.000",
-    image: "/Gemini_Generated_Image_h0jrkah0jrkah0jr.png"
+    image: "/vender-moto.webp"
   },
   {
     id: 3,
@@ -246,7 +246,7 @@ const LOCAL_GOLD = [
     karats: "18k",
     weight: "5 gr",
     price: "$1.350.000",
-    image: "/Gemini_Generated_Image_h0jrkah0jrkah0jr.png"
+    image: "/vender-moto.webp"
   }
 ];
 
@@ -273,6 +273,11 @@ const CATALOG_DESCRIPTIONS = {
 function getPrimaryImage(product) {
   const images = (product.product_images || []).slice().sort((a, b) => a.sort_order - b.sort_order);
   return images[0]?.url || "";
+}
+
+function getAllImages(product) {
+  const images = (product.product_images || []).slice().sort((a, b) => a.sort_order - b.sort_order);
+  return images.map(img => img.url).filter(Boolean);
 }
 
 function inferVehicleSubtype(product) {
@@ -339,6 +344,7 @@ function mapProductToRepuesto(product) {
     description: product.description || "",
     price: product.price || "Consultar",
     image: getPrimaryImage(product),
+    images: getAllImages(product),
   };
 }
 
@@ -500,16 +506,30 @@ function buildRepuestoCard(item) {
   const msg = `¡Hola Harry! Estoy interesado en ${item.name}${item.brand ? ` (${item.brand})` : ""} del catálogo de repuestos y accesorios. ¿Está disponible?`;
   const waUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(msg)}`;
 
+  let imgHTML = '';
+  if (item.images && item.images.length > 1) {
+    const imagesJson = JSON.stringify(item.images).replace(/"/g, '&quot;');
+    const dots = item.images.map((_, i) => `<span class="img-dot ${i === 0 ? 'active' : ''}"></span>`).join('');
+    imgHTML = `
+      <img src="${item.images[0]}" class="slider-img" alt="${item.name}" loading="lazy" data-images="${imagesJson}" data-idx="0">
+      <div class="slider-controls">
+        <button type="button" class="slider-btn prev-btn" aria-label="Anterior" onclick="window.changeSliderImage(event, this, -1)">❮</button>
+        <button type="button" class="slider-btn next-btn" aria-label="Siguiente" onclick="window.changeSliderImage(event, this, 1)">❯</button>
+      </div>
+      <div class="slider-dots">${dots}</div>
+    `;
+  } else if (item.image) {
+    imgHTML = `<img src="${item.image}" alt="${item.name}" loading="lazy">`;
+  } else {
+    imgHTML = `<div class="card-img-placeholder"><span>🔧</span><p>Sin imagen</p></div>`;
+  }
+
   const card = document.createElement("article");
   card.className = "catalog-card reveal active";
   card.innerHTML = `
-    <div class="card-img-wrap">
+    <div class="card-img-wrap ${item.images && item.images.length > 1 ? 'has-slider' : ''}">
       <div class="card-overlay"></div>
-      ${
-        item.image
-          ? `<img src="${item.image}" alt="${item.name}" loading="lazy">`
-          : `<div class="card-img-placeholder"><span>🔧</span><p>Sin imagen</p></div>`
-      }
+      ${imgHTML}
     </div>
     <div class="card-body">
       <h3 class="card-title">${item.name}</h3>
@@ -731,6 +751,28 @@ function initTabs() {
     btn.addEventListener("click", () => switchTab(btn.dataset.tab));
   });
 
+  // Navegación por teclado en el tablist (flechas, Home, End)
+  const menu = document.getElementById("catalogMenu");
+  if (menu) {
+    menu.addEventListener("keydown", (e) => {
+      const tabs = Array.from(menu.querySelectorAll(".catalog-menu-btn"));
+      const idx = tabs.indexOf(document.activeElement);
+      if (idx === -1) return;
+
+      let next = null;
+      if (e.key === "ArrowDown" || e.key === "ArrowRight") next = (idx + 1) % tabs.length;
+      else if (e.key === "ArrowUp" || e.key === "ArrowLeft") next = (idx - 1 + tabs.length) % tabs.length;
+      else if (e.key === "Home") next = 0;
+      else if (e.key === "End") next = tabs.length - 1;
+
+      if (next !== null) {
+        e.preventDefault();
+        tabs[next].focus();
+        switchTab(tabs[next].dataset.tab, { scroll: false });
+      }
+    });
+  }
+
   const mobileToggle = document.getElementById("catalogMobileToggle");
   const sidebar = document.getElementById("catalogSidebar");
   const toggleText = document.getElementById("catalogMobileToggleText");
@@ -908,6 +950,33 @@ function initContactForm() {
 // =========================================
 // BOOTSTRAP
 // =========================================
+
+
+window.changeSliderImage = function(e, btn, dir) {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  const wrap = btn.closest('.card-img-wrap');
+  const img = wrap.querySelector('.slider-img');
+  const dots = wrap.querySelectorAll('.img-dot');
+  
+  if (!img) return;
+  
+  const images = JSON.parse(img.getAttribute('data-images') || '[]');
+  if (images.length === 0) return;
+  
+  let currentIdx = parseInt(img.getAttribute('data-idx') || '0', 10);
+  currentIdx = (currentIdx + dir + images.length) % images.length;
+  
+  img.src = images[currentIdx];
+  img.setAttribute('data-idx', currentIdx);
+  
+  dots.forEach((dot, i) => {
+    dot.classList.toggle('active', i === currentIdx);
+  });
+};
+
 document.addEventListener("DOMContentLoaded", async () => {
   // 1. Init Supabase
   initSupabase();

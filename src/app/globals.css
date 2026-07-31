@@ -175,33 +175,35 @@ img, video {
   box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
 }
 
-/* Mobile Menu Toggle */
+/* Mobile Menu Toggle — área táctil mínima 44×44px */
 .menu-toggle {
   display: none;
   background: none;
   border: none;
   cursor: pointer;
-  width: 30px;
-  height: 24px;
+  width: 44px;
+  height: 44px;
   position: relative;
+  flex-shrink: 0;
 }
 
 .menu-toggle span {
   display: block;
-  width: 100%;
+  width: 24px;
   height: 2px;
+  left: 10px;
   background-color: var(--text-primary);
   position: absolute;
   transition: transform var(--transition-fast), opacity var(--transition-fast);
 }
 
-.menu-toggle span:nth-child(1) { top: 0; }
-.menu-toggle span:nth-child(2) { top: 11px; }
-.menu-toggle span:nth-child(3) { bottom: 0; }
+.menu-toggle span:nth-child(1) { top: 14px; }
+.menu-toggle span:nth-child(2) { top: 21px; }
+.menu-toggle span:nth-child(3) { top: 28px; }
 
-.menu-toggle.active span:nth-child(1) { transform: translateY(11px) rotate(45deg); }
+.menu-toggle.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
 .menu-toggle.active span:nth-child(2) { opacity: 0; }
-.menu-toggle.active span:nth-child(3) { transform: translateY(-11px) rotate(-45deg); }
+.menu-toggle.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 /* Hero Section (Video Web Scrolling) */
 .hero {
@@ -266,7 +268,7 @@ img, video {
   letter-spacing: 0.2em;
   opacity: 0.75;
   pointer-events: none;
-  animation: scroll-cue-bounce 2.5s ease-in-out infinite;
+  transition: opacity 0.3s ease;
 }
 
 .hero-scroll-arrow {
@@ -347,6 +349,12 @@ img, video {
   background: rgba(220, 38, 38, 0.08);
 }
 
+.catalog-mobile-toggle-icon svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
 .catalog-layout {
   display: grid;
   grid-template-columns: 1fr;
@@ -391,7 +399,11 @@ img, video {
 }
 
 .catalog-menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   text-align: left;
+  min-height: 44px;
   padding: 0.75rem 1rem;
   border-radius: 6px;
   border: 1px solid transparent;
@@ -402,6 +414,12 @@ img, video {
   font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-fast);
+}
+
+.catalog-menu-btn svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
 
 .catalog-menu-btn:hover {
@@ -587,7 +605,7 @@ section:not(.tab-panel) {
 /* Image container */
 .card-img-wrap {
   position: relative;
-  aspect-ratio: 16/10;
+  aspect-ratio: 4/5;
   overflow: hidden;
   background-color: #000;
 }
@@ -870,6 +888,24 @@ section:not(.tab-panel) {
   border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-field label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-silver);
+}
+
+.required-mark {
+  color: var(--accent);
+}
+
 .contact-form input, .contact-form textarea {
   width: 100%;
   background-color: var(--bg-pure);
@@ -878,8 +914,13 @@ section:not(.tab-panel) {
   border-radius: 4px;
   color: var(--text-primary);
   font-family: var(--font-sans);
-  font-size: 0.85rem;
+  /* 16px mínimo: evita el zoom automático de iOS al enfocar */
+  font-size: 1rem;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.contact-form input::placeholder, .contact-form textarea::placeholder {
+  color: var(--text-muted);
 }
 
 .contact-form input:focus, .contact-form textarea:focus {
@@ -970,8 +1011,8 @@ section:not(.tab-panel) {
 }
 
 .social-link {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: 4px;
   background-color: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -1007,10 +1048,16 @@ section:not(.tab-panel) {
   margin-bottom: 0.75rem;
 }
 
-.footer-col ul li a {
+.footer-col ul li a,
+.footer-col ul li .footer-text {
   font-size: 0.85rem;
   color: var(--text-muted);
   transition: color var(--transition-fast);
+}
+
+.footer-col ul li a {
+  display: inline-block;
+  padding: 0.2rem 0;
 }
 
 .footer-col ul li a:hover {
@@ -1101,6 +1148,16 @@ section:not(.tab-panel) {
   }
 }
 
+@media (max-width: 520px) {
+  .nav-inner {
+    padding: 0.75rem 1rem;
+  }
+
+  .logo {
+    font-size: 1.05rem;
+  }
+}
+
 @media (max-width: 768px) {
   .nav-links {
     display: none; /* Mobile menu toggled via JS */
@@ -1174,6 +1231,10 @@ section:not(.tab-panel) {
   background: linear-gradient(135deg, #181818 0%, #1f0808 100%);
 }
 
+.catalog-card--static .card-img-wrap {
+  aspect-ratio: 16/10;
+}
+
 .catalog-card--static:hover {
   box-shadow: 0 0 50px rgba(220, 38, 38, 0.45), 0 16px 40px rgba(0, 0, 0, 0.7);
 }
@@ -1227,6 +1288,13 @@ section:not(.tab-panel) {
   margin-top: 1px;
 }
 
+.card-bullets li span svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+  margin-top: 2px;
+}
+
 /* Static card CTA variant */
 .btn-card--static {
   background: linear-gradient(135deg, var(--accent) 0%, #b91c1c 100%);
@@ -1270,7 +1338,14 @@ section:not(.tab-panel) {
 .rental-warning-icon {
   font-size: 2.5rem;
   flex-shrink: 0;
+  color: var(--accent);
   filter: drop-shadow(0 0 10px rgba(220, 38, 38, 0.5));
+}
+
+.rental-warning-icon svg {
+  width: 40px;
+  height: 40px;
+  display: block;
 }
 
 .rental-warning-text h3 {
@@ -1471,15 +1546,12 @@ section:not(.tab-panel) {
 
 /* Nav admin button */
 .nav-admin-btn {
-  font-size: 0.75rem !important;
+  font-size: 0.8rem !important;
   color: var(--text-muted) !important;
-  opacity: 0.7;
-  transition: opacity var(--transition-fast) !important;
 }
 
 .nav-admin-btn:hover {
   color: var(--text-silver) !important;
-  opacity: 1;
 }
 
 /* =========================================
@@ -1540,7 +1612,14 @@ section:not(.tab-panel) {
 .tramite-featured-icon {
   font-size: 2.5rem;
   flex-shrink: 0;
+  color: var(--accent);
   filter: drop-shadow(0 0 8px rgba(220, 38, 38, 0.4));
+}
+
+.tramite-featured-icon svg {
+  width: 40px;
+  height: 40px;
+  display: block;
 }
 
 .tramite-priority-badge {
@@ -1780,6 +1859,13 @@ section:not(.tab-panel) {
 .divisas-disclaimer-icon {
   font-size: 1.5rem;
   flex-shrink: 0;
+  color: var(--accent);
+}
+
+.divisas-disclaimer-icon svg {
+  width: 24px;
+  height: 24px;
+  display: block;
 }
 
 .divisas-disclaimer p {
@@ -1908,6 +1994,13 @@ section:not(.tab-panel) {
 .divisa-action-icon {
   font-size: 2.25rem;
   margin-bottom: 0.75rem;
+  color: #22c55e;
+}
+
+.divisa-action-icon svg {
+  width: 36px;
+  height: 36px;
+  display: block;
 }
 
 .divisa-action-card h3 {
@@ -2028,3 +2121,53 @@ section:not(.tab-panel) {
     gap: 3rem;
   }
 }
+
+/* =========================================
+   ACCESIBILIDAD GLOBAL
+   ========================================= */
+
+/* Indicador de foco visible para navegación por teclado */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.contact-form input:focus-visible,
+.contact-form textarea:focus-visible {
+  outline: none; /* estos campos ya tienen indicador propio via border + shadow */
+}
+
+/* Hero estático cuando el usuario prefiere menos movimiento */
+.home-hero--static {
+  height: 100vh !important;
+  height: 100dvh !important;
+}
+
+/* Respeto por prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Slider Controls */
+.slider-controls { position: absolute; top: 50%; left: 0; right: 0; display: flex; justify-content: space-between; transform: translateY(-50%); padding: 0 0.5rem; opacity: 0; transition: opacity 0.3s; z-index: 2; pointer-events: none; }
+.has-slider:hover .slider-controls { opacity: 1; }
+.slider-btn { background: rgba(0, 0, 0, 0.6); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto; transition: background 0.2s, transform 0.2s; backdrop-filter: blur(4px); }
+.slider-btn:hover { background: var(--accent); transform: scale(1.1); }
+.slider-dots { position: absolute; bottom: 0.5rem; left: 0; right: 0; display: flex; justify-content: center; gap: 4px; z-index: 2; }
+.img-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.4); transition: background 0.2s, transform 0.2s; }
+.img-dot.active { background: white; transform: scale(1.3); }

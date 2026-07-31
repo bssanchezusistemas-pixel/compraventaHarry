@@ -43,8 +43,11 @@ function getFrameLayout(
     scale = containScale * zoom;
     scale = Math.min(scale, coverScale * 0.995);
   } else {
+    // En PC, usamos containScale para evitar recortes masivos en monitores anchos (16:9).
+    // Aplicamos un ligero zoom inicial (1.15x) que se aleja a 1x (containScale) hacia el final.
     const logoPhase = Math.min(Math.max((frameT - 0.72) / 0.28, 0), 1);
-    scale = coverScale * (1 - logoPhase * 0.2) + containScale * (logoPhase * 0.2);
+    const zoom = 1.15 * (1 - logoPhase) + 1 * logoPhase;
+    scale = containScale * zoom;
   }
 
   const drawW = imgW * scale;
@@ -160,15 +163,22 @@ export default function HomeHero() {
       });
 
     const preload = async () => {
+      // Cargar primer frame de inmediato
       await loadFrame(0);
 
-      const batchSize = 24;
+      // Pequeña pausa para permitir que la página y otros assets vitales se hidraten primero
+      await new Promise((resolve) => setTimeout(resolve, 600));
+
+      // Cargar en lotes más pequeños para no ahogar la red de golpe
+      const batchSize = 12;
       for (let start = 1; start < FRAME_COUNT; start += batchSize) {
         if (cancelled) return;
         const end = Math.min(start + batchSize, FRAME_COUNT);
         await Promise.all(
           Array.from({ length: end - start }, (_, i) => loadFrame(start + i))
         );
+        // Pequeño respiro entre lotes
+        await new Promise((resolve) => setTimeout(resolve, 50));
       }
 
       if (!cancelled) {

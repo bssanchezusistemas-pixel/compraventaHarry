@@ -1,5 +1,16 @@
+import Image from "next/image";
 import HomeHero from "@/components/HomeHero";
-import LegacyStubLink from "@/components/LegacyStubLink";
+import LegacyHomeScripts from "@/components/LegacyHomeScripts";
+import {
+  IconAlertTriangle,
+  IconChartLine,
+  IconCheck,
+  IconClipboardList,
+  IconDollarSign,
+  IconEuro,
+  IconMenu,
+  IconZap,
+} from "@/components/icons";
 
 export default function PreviewPage() {
   return (
@@ -18,7 +29,7 @@ export default function PreviewPage() {
             <a href="#catalogo">Catálogo</a>
             <a href="#contacto">Contacto</a>
             <a href="/admin" className="nav-admin-btn">
-              Admin ⚙️
+              Admin
             </a>
           </nav>
 
@@ -66,7 +77,7 @@ export default function PreviewPage() {
             aria-controls="catalogSidebar"
           >
             <span className="catalog-mobile-toggle-icon" aria-hidden="true">
-              ☰
+              <IconMenu />
             </span>
             <span id="catalogMobileToggleText">Menú Catálogo</span>
           </button>
@@ -84,73 +95,80 @@ export default function PreviewPage() {
               >
                 <button
                   className="catalog-menu-btn active"
+                  id="tab-motos"
                   data-tab="motos"
                   role="tab"
                   aria-selected="true"
                   aria-controls="panel-motos"
                   type="button"
                 >
-                  🏍️ Motos
+                  🏍️ <span>Motos</span>
                 </button>
                 <button
                   className="catalog-menu-btn"
+                  id="tab-carros"
                   data-tab="carros"
                   role="tab"
                   aria-selected="false"
                   aria-controls="panel-carros"
                   type="button"
                 >
-                  🚗 Carros
+                  🚗 <span>Carros</span>
                 </button>
                 <button
                   className="catalog-menu-btn"
+                  id="tab-oro"
                   data-tab="oro"
                   role="tab"
                   aria-selected="false"
                   aria-controls="panel-oro"
                   type="button"
                 >
-                  ✨ Oro
+                  ✨ <span>Oro</span>
                 </button>
                 <button
                   className="catalog-menu-btn"
+                  id="tab-divisas"
                   data-tab="divisas"
                   role="tab"
                   aria-selected="false"
                   aria-controls="panel-divisas"
                   type="button"
                 >
-                  💵 Dólares y Euros
+                  💵 <span>Dólares y Euros</span>
                 </button>
                 <button
                   className="catalog-menu-btn"
+                  id="tab-tramites"
                   data-tab="tramites"
                   role="tab"
                   aria-selected="false"
                   aria-controls="panel-tramites"
                   type="button"
                 >
-                  📄 Trámites y Papeles
+                  📄 <span>Trámites y Papeles</span>
                 </button>
                 <button
                   className="catalog-menu-btn"
+                  id="tab-repuestos"
                   data-tab="repuestos"
                   role="tab"
                   aria-selected="false"
                   aria-controls="panel-repuestos"
                   type="button"
                 >
-                  🔧 Repuestos y Accesorios
+                  🔧 <span>Repuestos y Accesorios</span>
                 </button>
                 <button
                   className="catalog-menu-btn"
+                  id="tab-alquiler"
                   data-tab="alquiler"
                   role="tab"
                   aria-selected="false"
                   aria-controls="panel-alquiler"
                   type="button"
                 >
-                  🔑 Alquiler
+                  🔑 <span>Alquiler</span>
                 </button>
               </nav>
             </aside>
@@ -174,10 +192,12 @@ export default function PreviewPage() {
                       <article className="catalog-card catalog-card--static">
                         <div className="card-img-wrap">
                           <div className="card-overlay" />
-                          <img
-                            src="/Gemini_Generated_Image_h0jrkah0jrkah0jr.png"
+                          <Image
+                            src="/vender-moto.webp"
                             alt="Vende tu moto con Harry"
-                            loading="eager"
+                            fill
+                            sizes="(max-width: 768px) 100vw, 400px"
+                            style={{ objectFit: "cover" }}
                           />
                           <span className="card-badge-static">Servicio Directo</span>
                         </div>
@@ -188,28 +208,28 @@ export default function PreviewPage() {
                           </p>
                           <ul className="card-bullets">
                             <li>
-                              <span>✓</span> Fotos reales
+                              <span><IconCheck /></span> Fotos reales
                             </li>
                             <li>
-                              <span>✓</span> Precio pretendido
+                              <span><IconCheck /></span> Precio pretendido
                             </li>
                             <li>
-                              <span>✓</span> Modelo / Año
+                              <span><IconCheck /></span> Modelo / Año
                             </li>
                             <li>
-                              <span>✓</span> Estado de Impuestos
+                              <span><IconCheck /></span> Estado de Impuestos
                             </li>
                             <li>
-                              <span>✓</span> Kilometraje actual
+                              <span><IconCheck /></span> Kilometraje actual
                             </li>
                             <li>
-                              <span>✓</span> Placa (¿De dónde es?)
+                              <span><IconCheck /></span> Placa (¿De dónde es?)
                             </li>
                             <li>
-                              <span>✓</span> SOAT (¿Hasta cuándo?)
+                              <span><IconCheck /></span> SOAT (¿Hasta cuándo?)
                             </li>
                             <li>
-                              <span>✓</span> Tecno (¿Hasta cuándo?)
+                              <span><IconCheck /></span> Tecno (¿Hasta cuándo?)
                             </li>
                           </ul>
                           <a
@@ -269,19 +289,19 @@ export default function PreviewPage() {
                           </p>
                           <ul className="card-bullets">
                             <li>
-                              <span>⚡</span> Fotos nítidas de la pieza
+                              <span><IconZap /></span> Fotos nítidas de la pieza
                             </li>
                             <li>
-                              <span>⚡</span> Color del oro
+                              <span><IconZap /></span> Color del oro
                             </li>
                             <li>
-                              <span>⚡</span> Precio estimado
+                              <span><IconZap /></span> Precio estimado
                             </li>
                             <li>
-                              <span>⚡</span> Kilates
+                              <span><IconZap /></span> Kilates
                             </li>
                             <li>
-                              <span>⚡</span> Centímetros / Medidas
+                              <span><IconZap /></span> Centímetros / Medidas
                             </li>
                           </ul>
                           <a
@@ -318,7 +338,7 @@ export default function PreviewPage() {
 
                     <div className="divisas-disclaimer">
                       <span className="divisas-disclaimer-icon" aria-hidden="true">
-                        📊
+                        <IconChartLine />
                       </span>
                       <p>
                         Tasas referenciales del día. La cotización final se confirma por WhatsApp según
@@ -330,7 +350,7 @@ export default function PreviewPage() {
 
                     <div className="divisas-actions-grid">
                       <article className="divisa-action-card">
-                        <div className="divisa-action-icon">💵</div>
+                        <div className="divisa-action-icon" aria-hidden="true"><IconDollarSign /></div>
                         <h3>Comprar Divisas</h3>
                         <p>
                           Adquiere dólares o euros con atención personalizada, proceso ágil y entrega
@@ -338,13 +358,13 @@ export default function PreviewPage() {
                         </p>
                         <ul className="card-bullets">
                           <li>
-                            <span>✓</span> Moneda deseada (USD o EUR)
+                            <span><IconCheck /></span> Moneda deseada (USD o EUR)
                           </li>
                           <li>
-                            <span>✓</span> Monto a comprar en pesos colombianos
+                            <span><IconCheck /></span> Monto a comprar en pesos colombianos
                           </li>
                           <li>
-                            <span>✓</span> Forma de pago y ciudad de entrega
+                            <span><IconCheck /></span> Forma de pago y ciudad de entrega
                           </li>
                         </ul>
                         <a
@@ -358,7 +378,7 @@ export default function PreviewPage() {
                       </article>
 
                       <article className="divisa-action-card divisa-action-card--sell">
-                        <div className="divisa-action-icon">💶</div>
+                        <div className="divisa-action-icon" aria-hidden="true"><IconEuro /></div>
                         <h3>Vender Divisas</h3>
                         <p>
                           Vende tus dólares o euros y recibe pesos colombianos al mejor precio del
@@ -366,13 +386,13 @@ export default function PreviewPage() {
                         </p>
                         <ul className="card-bullets">
                           <li>
-                            <span>✓</span> Tipo de moneda y cantidad en efectivo
+                            <span><IconCheck /></span> Tipo de moneda y cantidad en efectivo
                           </li>
                           <li>
-                            <span>✓</span> Billetes en buen estado (sin daños)
+                            <span><IconCheck /></span> Billetes en buen estado (sin daños)
                           </li>
                           <li>
-                            <span>✓</span> Documento de identidad vigente
+                            <span><IconCheck /></span> Documento de identidad vigente
                           </li>
                         </ul>
                         <a
@@ -403,7 +423,7 @@ export default function PreviewPage() {
 
                     <div className="tramite-featured-card">
                       <div className="tramite-featured-header">
-                        <div className="tramite-featured-icon">📋</div>
+                        <div className="tramite-featured-icon" aria-hidden="true"><IconClipboardList /></div>
                         <div>
                           <span className="tramite-priority-badge">Requisito Previo</span>
                           <h3>Traspaso de Vehículo — Documentos que necesitas</h3>
@@ -415,16 +435,16 @@ export default function PreviewPage() {
                       </p>
                       <ul className="card-bullets tramite-bullets">
                         <li>
-                          <span>📌</span> Improntas nítidas (número de chasis y motor)
+                          <span><IconCheck /></span> Improntas nítidas (número de chasis y motor)
                         </li>
                         <li>
-                          <span>📌</span> Contrato de compraventa firmado por ambas partes
+                          <span><IconCheck /></span> Contrato de compraventa firmado por ambas partes
                         </li>
                         <li>
-                          <span>📌</span> Paz y salvo de impuestos del año en curso
+                          <span><IconCheck /></span> Paz y salvo de impuestos del año en curso
                         </li>
                         <li>
-                          <span>📌</span> SOAT y Tecnicomecánica vigentes en el RUNT
+                          <span><IconCheck /></span> SOAT y Tecnicomecánica vigentes en el RUNT
                         </li>
                       </ul>
                       <a
@@ -475,7 +495,7 @@ export default function PreviewPage() {
                     </header>
 
                     <div className="rental-warning-box">
-                      <div className="rental-warning-icon">⚠️</div>
+                      <div className="rental-warning-icon" aria-hidden="true"><IconAlertTriangle /></div>
                       <div className="rental-warning-text">
                         <h3>REQUISITO MÍNIMO DE ALQUILER</h3>
                         <p>
@@ -543,23 +563,48 @@ export default function PreviewPage() {
                 </div>
               </div>
               <form className="contact-form" id="contactForm">
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Tu Nombre"
-                  required
-                  autoComplete="name"
-                />
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Tu Correo Electrónico"
-                  required
-                  autoComplete="email"
-                />
-                <textarea name="message" placeholder="¿En qué te podemos ayudar?" required />
+                <div className="form-field">
+                  <label htmlFor="contact-name">
+                    Nombre <span className="required-mark" aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    id="contact-name"
+                    type="text"
+                    name="name"
+                    placeholder="Ej: Juan Pérez"
+                    required
+                    autoComplete="name"
+                  />
+                </div>
+                <div className="form-field">
+                  <label htmlFor="contact-email">
+                    Correo electrónico <span className="required-mark" aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    id="contact-email"
+                    type="email"
+                    name="email"
+                    placeholder="Ej: juan@correo.com"
+                    required
+                    autoComplete="email"
+                  />
+                </div>
+                <div className="form-field">
+                  <label htmlFor="contact-message">
+                    Mensaje <span className="required-mark" aria-hidden="true">*</span>
+                  </label>
+                  <textarea
+                    id="contact-message"
+                    name="message"
+                    placeholder="¿En qué te podemos ayudar?"
+                    required
+                  />
+                </div>
                 <button type="submit">Enviar a WhatsApp</button>
-                <p className="form-disclaimer">*Al enviar se abrirá WhatsApp con tus datos.</p>
+                <p className="form-disclaimer">
+                  Los campos con <span className="required-mark">*</span> son obligatorios. Al enviar
+                  se abrirá WhatsApp con tus datos.
+                </p>
               </form>
             </div>
             <div className="map-container reveal">
@@ -597,12 +642,6 @@ export default function PreviewPage() {
                 >
                   IG
                 </a>
-                <LegacyStubLink className="social-link" aria-label="Facebook">
-                  FB
-                </LegacyStubLink>
-                <LegacyStubLink className="social-link" aria-label="TikTok">
-                  TT
-                </LegacyStubLink>
               </div>
             </div>
             <div className="footer-col">
@@ -660,10 +699,10 @@ export default function PreviewPage() {
               <h4>Horario</h4>
               <ul>
                 <li>
-                  <a href="#">Lun – Sáb: 8AM – 7PM</a>
+                  <span className="footer-text">Lun – Sáb: 8AM – 7PM</span>
                 </li>
                 <li>
-                  <a href="#">Respuesta &lt; 1 hora</a>
+                  <span className="footer-text">Respuesta &lt; 1 hora</span>
                 </li>
                 <li>
                   <a href="https://wa.me/573127622440" target="_blank" rel="noopener noreferrer">
@@ -692,6 +731,8 @@ export default function PreviewPage() {
           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
         </svg>
       </a>
+
+      <LegacyHomeScripts />
     </>
   );
 }
