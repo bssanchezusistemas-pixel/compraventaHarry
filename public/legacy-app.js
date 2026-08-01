@@ -301,6 +301,7 @@ function mapProductToVehicle(product) {
     mileage: m.mileage || m.kilometraje || "Consultar",
     price: product.price || "",
     image: getPrimaryImage(product),
+    images: getAllImages(product),
   };
 }
 
@@ -368,6 +369,7 @@ async function loadData() {
       const { data, error } = await supabaseClient
         .from("cv_products")
         .select("*, product_images:cv_product_images(*)")
+        .order("created_at", { ascending: false }) // Added ordering so first uploaded/newest shows first
         .eq("status", "publicado");
 
       if (error) throw error;
@@ -412,12 +414,30 @@ function buildVehicleCard(vehicle) {
   const waUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(waMsg)}`;
   const btnLabel = isRental ? "Consultar Alquiler" : "Consultar Disponibilidad";
 
+  let imgHTML = '';
+  if (vehicle.images && vehicle.images.length > 1) {
+    const imagesJson = JSON.stringify(vehicle.images).replace(/"/g, '&quot;');
+    const dots = vehicle.images.map((_, i) => `<span class="img-dot ${i === 0 ? 'active' : ''}"></span>`).join('');
+    imgHTML = `
+      <img src="${vehicle.images[0]}" class="slider-img" alt="${vehicle.name}" loading="lazy" data-images="${imagesJson}" data-idx="0">
+      <div class="slider-controls">
+        <button type="button" class="slider-btn prev-btn" aria-label="Anterior" onclick="window.changeSliderImage(event, this, -1)">❮</button>
+        <button type="button" class="slider-btn next-btn" aria-label="Siguiente" onclick="window.changeSliderImage(event, this, 1)">❯</button>
+      </div>
+      <div class="slider-dots">${dots}</div>
+    `;
+  } else if (vehicle.image) {
+    imgHTML = `<img src="${vehicle.image}" alt="${vehicle.name}" loading="lazy">`;
+  } else {
+    imgHTML = `<div class="card-img-placeholder"><span>🏍️</span><p>Sin imagen</p></div>`;
+  }
+
   const card = document.createElement("article");
   card.className = "catalog-card reveal active";
   card.innerHTML = `
-    <div class="card-img-wrap">
+    <div class="card-img-wrap ${vehicle.images && vehicle.images.length > 1 ? 'has-slider' : ''}">
       <div class="card-overlay"></div>
-      <img src="${vehicle.image}" alt="${vehicle.name}" loading="lazy">
+      ${imgHTML}
     </div>
     <div class="card-body">
       <h3 class="card-title">${vehicle.name}</h3>
