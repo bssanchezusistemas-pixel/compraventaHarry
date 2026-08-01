@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import HomeHero from "@/components/HomeHero";
 import LegacyHomeScripts from "@/components/LegacyHomeScripts";
@@ -187,6 +189,13 @@ export default function PreviewPage() {
                       <p className="section-label">Dos Ruedas</p>
                       <h2 className="section-title">Catálogo de Motos</h2>
                     </header>
+
+                    <div className="subcategory-filters" id="motosFilters">
+                      <button className="subcategory-btn active" onClick={(e) => (window as any).setMotoFilter('todas', e.currentTarget)}>Todas</button>
+                      <button className="subcategory-btn" onClick={(e) => (window as any).setMotoFilter('nmax', e.currentTarget)}>N Max</button>
+                      <button className="subcategory-btn" onClick={(e) => (window as any).setMotoFilter('crypton', e.currentTarget)}>Crypton fi</button>
+                      <button className="subcategory-btn" onClick={(e) => (window as any).setMotoFilter('otras', e.currentTarget)}>Otras</button>
+                    </div>
 
                     <div className="catalog-grid" id="motosGrid">
                       <article className="catalog-card catalog-card--static">

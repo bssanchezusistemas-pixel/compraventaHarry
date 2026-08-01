@@ -588,16 +588,26 @@ function showEmpty(grid, msg = "No hay artículos disponibles en este momento.",
 // =========================================
 // RENDER FUNCTIONS
 // =========================================
+let currentMotoFilter = "todas";
+
 function renderMotos() {
   const grid = document.getElementById("motosGrid");
   if (!grid) return;
 
   grid.querySelectorAll(".catalog-card:not(.catalog-card--static), .catalog-empty").forEach(el => el.remove());
 
-  const motos = vehicles.filter(v => v.type === "moto" && v.purpose === "venta");
+  let motos = vehicles.filter(v => v.type === "moto" && v.purpose === "venta");
+  
+  if (currentMotoFilter === "nmax") {
+    motos = motos.filter(v => v.name.toLowerCase().includes("nmax") || v.category === "yamaha-nmax");
+  } else if (currentMotoFilter === "crypton") {
+    motos = motos.filter(v => v.name.toLowerCase().includes("crypton") || v.category === "crypton-fi");
+  } else if (currentMotoFilter === "otras") {
+    motos = motos.filter(v => !v.name.toLowerCase().includes("nmax") && !v.name.toLowerCase().includes("crypton") && v.category !== "yamaha-nmax" && v.category !== "crypton-fi");
+  }
 
   if (motos.length === 0) {
-    showEmpty(grid, "No hay motos disponibles actualmente. ¡Vuelve pronto!", true);
+    showEmpty(grid, "No hay motos disponibles en esta categoría.", true);
     return;
   }
 
@@ -999,6 +1009,25 @@ window.changeSliderImage = function(e, btn, dir) {
     dot.classList.toggle('active', i === currentIdx);
   });
 };
+
+window.setMotoFilter = function(filterId, btn) {
+  currentMotoFilter = filterId;
+  const filterContainer = document.getElementById('motosFilters');
+  if (filterContainer) {
+    const buttons = filterContainer.querySelectorAll('.subcategory-btn');
+    buttons.forEach(b => b.classList.remove('active'));
+  }
+  if (btn) btn.classList.add('active');
+  
+  const motosGrid = document.getElementById("motosGrid");
+  if (motosGrid) {
+    const staticCard = motosGrid.querySelector(".catalog-card--static");
+    motosGrid.innerHTML = "";
+    if (staticCard) motosGrid.appendChild(staticCard);
+    renderMotos();
+  }
+};
+
 
 document.addEventListener("DOMContentLoaded", async () => {
   // 1. Init Supabase
