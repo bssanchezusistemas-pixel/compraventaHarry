@@ -9,8 +9,8 @@ import * as supabaseJs from "@supabase/supabase-js";
 if (typeof window !== "undefined") {
   const w = window as unknown as Record<string, unknown>;
   w.supabase = supabaseJs;
-  w.__SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-  w.__SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+  w.__SUPABASE_URL = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim();
+  w.__SUPABASE_ANON_KEY = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").trim();
 }
 
 function dispatchDomContentLoadedIfReady() {

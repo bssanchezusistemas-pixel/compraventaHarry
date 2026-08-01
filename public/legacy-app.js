@@ -12,8 +12,8 @@ let supabaseClient = null;
 let usingSupabase = false;
 
 function initSupabase() {
-  const url = window.__SUPABASE_URL || "";
-  const key = window.__SUPABASE_ANON_KEY || "";
+  const url = (window.__SUPABASE_URL || "").trim();
+  const key = (window.__SUPABASE_ANON_KEY || "").trim();
 
   if (url && key && url.includes("supabase.co") && key.length > 20) {
     try {
