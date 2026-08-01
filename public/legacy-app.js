@@ -910,9 +910,9 @@ function handleScrollEffects(scrollY) {
   // 1. Progress bar
   const docHeight = document.documentElement.scrollHeight - windowHeight;
   if (docHeight > 0) {
-    const pct = (scrollY / docHeight) * 100;
+    const pct = scrollY / docHeight;
     const bar = document.querySelector(".scroll-progress");
-    if (bar) bar.style.width = `${pct}%`;
+    if (bar) bar.style.transform = `scaleX(${pct})`;
   }
 
   // 2. Navbar

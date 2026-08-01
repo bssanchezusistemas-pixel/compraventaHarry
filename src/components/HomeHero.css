@@ -43,6 +43,7 @@
   opacity: 0;
   pointer-events: none;
   z-index: 2;
+  will-change: opacity;
 }
 
 .home-hero__loader {
@@ -62,6 +63,7 @@
   bottom: 50px;
   z-index: 10;
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+  will-change: opacity;
 }
 
 .home-hero__cue span {
@@ -103,5 +105,21 @@
 @media (max-width: 640px) {
   .home-hero {
     height: 420vh;
+  }
+}
+
+/* Vignette para ocultar bordes duros de imágenes */
+.home-hero__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 30%, #000 95%);
+  z-index: 1;
+}
+
+@media (min-width: 769px) {
+  .home-hero__media::after {
+    background: radial-gradient(ellipse at center, transparent 50%, #000 100%);
   }
 }

@@ -69,12 +69,14 @@ img, video {
   position: fixed;
   top: 0;
   left: 0;
-  width: 0%;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left;
   height: 3px;
   background-color: var(--accent);
   box-shadow: 0 0 8px var(--accent);
   z-index: 1000;
-  transition: width 0.1s linear;
+  will-change: transform;
 }
 
 /* Glassmorphic Navbar */
@@ -85,8 +87,7 @@ img, video {
   width: 100%;
   z-index: 100;
   background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  /* Eliminado backdrop-filter: blur() por ser extremadamente costoso al repintar sobre el Hero canvas */
   border-bottom: 1px solid rgba(220, 38, 38, 0.15);
   transition: background var(--transition-fast), padding var(--transition-fast);
 }

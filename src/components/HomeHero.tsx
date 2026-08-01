@@ -39,7 +39,7 @@ function getFrameLayout(
 
   if (isPortrait) {
     // Usamos containScale para asegurar que la llanta no se recorte a los lados
-    // y se vea completa en la pantalla del celular. El fondo oscuro disimula los bordes.
+    // y se vea completa sin zoom exagerado.
     scale = containScale;
   } else {
     // En PC, usamos containScale para evitar recortes masivos en monitores anchos (16:9).
@@ -168,7 +168,7 @@ export default function HomeHero() {
       await loadFrame(0);
 
       // Pequeña pausa para permitir que la página y otros assets vitales se hidraten primero
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Cargar en lotes más pequeños para no ahogar la red de golpe
       const batchSize = 12;
@@ -241,6 +241,12 @@ export default function HomeHero() {
 
   return (
     <section ref={rootRef} className="home-hero" id="hero" aria-label="Hero">
+      {/* Precarga ultra-rápida del primer frame para LCP (Largest Contentful Paint) */}
+      <picture style={{ position: 'absolute', width: 1, height: 1, opacity: 0.001, pointerEvents: 'none', zIndex: -1 }} aria-hidden="true">
+        <source media="(max-aspect-ratio: 1/1)" srcSet={frameSrc(0, true)} />
+        <img src={frameSrc(0, false)} alt="" fetchPriority="high" />
+      </picture>
+      
       <div ref={pinRef} className="home-hero__pin">
         <div className="home-hero__media" aria-hidden="true">
           <canvas
