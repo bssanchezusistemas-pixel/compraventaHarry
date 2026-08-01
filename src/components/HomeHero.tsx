@@ -12,7 +12,10 @@ const FRAME_END_PROGRESS = 0.9;
 const LOGO_HOLD_PROGRESS = 0.96;
 const FADE_START_PROGRESS = 0.96;
 
-function frameSrc(index: number) {
+function frameSrc(index: number, isPortrait: boolean) {
+  if (isPortrait) {
+    return `/hero-sequence-mobile/${String(index + 1).padStart(5, "0")}_mobil.webp`;
+  }
   return `/hero-sequence/${String(index + 1).padStart(5, "0")}.webp`;
 }
 
@@ -35,13 +38,9 @@ function getFrameLayout(
   let scale: number;
 
   if (isPortrait) {
-    const logoPhase = Math.min(
-      Math.max((frameT - MOBILE_LOGO_START) / (1 - MOBILE_LOGO_START), 0),
-      1
-    );
-    const zoom = MOBILE_ZOOM * (1 - logoPhase) + logoPhase;
-    scale = containScale * zoom;
-    scale = Math.min(scale, coverScale * 0.995);
+    // Usamos containScale para asegurar que la llanta no se recorte a los lados
+    // y se vea completa en la pantalla del celular. El fondo oscuro disimula los bordes.
+    scale = containScale;
   } else {
     // En PC, usamos containScale para evitar recortes masivos en monitores anchos (16:9).
     // Aplicamos un ligero zoom inicial (1.15x) que se aleja a 1x (containScale) hacia el final.
@@ -147,11 +146,13 @@ export default function HomeHero() {
     let cancelled = false;
     const frames: HTMLImageElement[] = new Array(FRAME_COUNT);
 
+    const isPortrait = window.innerHeight > window.innerWidth * 1.05;
+
     const loadFrame = (index: number) =>
       new Promise<void>((resolve) => {
         const img = new Image();
         img.decoding = "async";
-        img.src = frameSrc(index);
+        img.src = frameSrc(index, isPortrait);
         img.onload = () => {
           if (!cancelled) {
             frames[index] = img;

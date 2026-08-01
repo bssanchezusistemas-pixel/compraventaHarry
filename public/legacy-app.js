@@ -599,6 +599,7 @@ function showEmpty(grid, msg = "No hay artículos disponibles en este momento.",
 // RENDER FUNCTIONS
 // =========================================
 let currentMotoFilter = "todas";
+let currentMotoLimit = 12;
 
 function renderMotos() {
   const grid = document.getElementById("motosGrid");
@@ -621,7 +622,23 @@ function renderMotos() {
     return;
   }
 
-  motos.forEach(m => grid.appendChild(buildVehicleCard(m)));
+  const paginatedMotos = motos.slice(0, currentMotoLimit);
+  paginatedMotos.forEach(m => grid.appendChild(buildVehicleCard(m)));
+
+  if (motos.length > currentMotoLimit) {
+    const loadMoreBtn = document.createElement("button");
+    loadMoreBtn.className = "btn-card";
+    loadMoreBtn.style.gridColumn = "1 / -1";
+    loadMoreBtn.style.marginTop = "2rem";
+    loadMoreBtn.style.justifySelf = "center";
+    loadMoreBtn.style.width = "auto";
+    loadMoreBtn.textContent = "Cargar más motos";
+    loadMoreBtn.onclick = () => {
+      currentMotoLimit += 12;
+      renderMotos();
+    };
+    grid.appendChild(loadMoreBtn);
+  }
 }
 
 function renderCarros() {
@@ -1026,6 +1043,7 @@ window.changeSliderImage = function(e, btn, dir) {
 
 window.setMotoFilter = function(filterId, btn) {
   currentMotoFilter = filterId;
+  currentMotoLimit = 12;
   const filterContainer = document.getElementById('motosFilters');
   if (filterContainer) {
     const buttons = filterContainer.querySelectorAll('.subcategory-btn');

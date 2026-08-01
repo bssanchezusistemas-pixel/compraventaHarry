@@ -324,10 +324,6 @@ export default function PreviewPage() {
                         </div>
                       </div>
 
-                      <div className="oro-buy-wrap">
-                        <h3 className="oro-buy-subtitle">Piezas Disponibles</h3>
-                        <div className="oro-buy-grid" id="oroGrid" />
-                      </div>
                     </div>
                   </div>
                 </section>

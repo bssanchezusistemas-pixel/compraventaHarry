@@ -1372,13 +1372,15 @@ section:not(.tab-panel) {
    ORO SECTION LAYOUT
    ========================================= */
 .oro-layout {
-  display: grid;
-  grid-template-columns: 1fr 1.5fr;
+  display: flex;
+  justify-content: center;
   gap: 3rem;
   align-items: start;
 }
 
 .oro-sell-card {
+  max-width: 500px;
+  width: 100%;
   background: linear-gradient(160deg, #1a1200 0%, #120a00 50%, #1a1200 100%);
   border: 2px solid rgba(212, 175, 55, 0.4);
   border-radius: 10px;
@@ -2053,7 +2055,6 @@ section:not(.tab-panel) {
    ========================================= */
 @media (max-width: 1024px) {
   .oro-layout {
-    grid-template-columns: 1fr;
     gap: 3rem;
   }
   .oro-sell-card {
