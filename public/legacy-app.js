@@ -379,7 +379,10 @@ async function loadData() {
       repuestosItems = products.filter((p) => p.type === "servicio").map(mapProductToRepuesto);
       exchangeRates = products.filter((p) => p.type === "divisa").map(mapProductToExchangeRate);
 
+      if (vehicles.length === 0) vehicles = LOCAL_VEHICLES;
+      if (goldItems.length === 0) goldItems = LOCAL_GOLD;
       if (tramiteServices.length === 0) tramiteServices = LOCAL_TRAMITES;
+      if (exchangeRates.length === 0) exchangeRates = LOCAL_EXCHANGE_RATES;
     } catch (err) {
       console.warn("Supabase fetch failed, using local data:", err);
       vehicles = LOCAL_VEHICLES;
