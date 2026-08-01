@@ -416,10 +416,15 @@ function buildVehicleCard(vehicle) {
 
   let imgHTML = '';
   if (vehicle.images && vehicle.images.length > 1) {
-    const imagesJson = JSON.stringify(vehicle.images).replace(/"/g, '&quot;');
     const dots = vehicle.images.map((_, i) => `<span class="img-dot ${i === 0 ? 'active' : ''}"></span>`).join('');
+    const imagesHTML = vehicle.images.map((url, i) => `
+      <img src="${url}" class="slider-img ${i === 0 ? 'active' : ''}" alt="${vehicle.name} - foto ${i+1}" loading="lazy">
+    `).join('');
+    
     imgHTML = `
-      <img src="${vehicle.images[0]}" class="slider-img" alt="${vehicle.name}" loading="lazy" data-images="${imagesJson}" data-idx="0">
+      <div class="slider-track" data-idx="0" data-total="${vehicle.images.length}">
+        ${imagesHTML}
+      </div>
       <div class="slider-controls">
         <button type="button" class="slider-btn prev-btn" aria-label="Anterior" onclick="window.changeSliderImage(event, this, -1)">❮</button>
         <button type="button" class="slider-btn next-btn" aria-label="Siguiente" onclick="window.changeSliderImage(event, this, 1)">❯</button>
@@ -531,10 +536,15 @@ function buildRepuestoCard(item) {
 
   let imgHTML = '';
   if (item.images && item.images.length > 1) {
-    const imagesJson = JSON.stringify(item.images).replace(/"/g, '&quot;');
     const dots = item.images.map((_, i) => `<span class="img-dot ${i === 0 ? 'active' : ''}"></span>`).join('');
+    const imagesHTML = item.images.map((url, i) => `
+      <img src="${url}" class="slider-img ${i === 0 ? 'active' : ''}" alt="${item.name} - foto ${i+1}" loading="lazy">
+    `).join('');
+    
     imgHTML = `
-      <img src="${item.images[0]}" class="slider-img" alt="${item.name}" loading="lazy" data-images="${imagesJson}" data-idx="0">
+      <div class="slider-track" data-idx="0" data-total="${item.images.length}">
+        ${imagesHTML}
+      </div>
       <div class="slider-controls">
         <button type="button" class="slider-btn prev-btn" aria-label="Anterior" onclick="window.changeSliderImage(event, this, -1)">❮</button>
         <button type="button" class="slider-btn next-btn" aria-label="Siguiente" onclick="window.changeSliderImage(event, this, 1)">❯</button>
@@ -991,19 +1001,23 @@ window.changeSliderImage = function(e, btn, dir) {
     e.stopPropagation();
   }
   const wrap = btn.closest('.card-img-wrap');
-  const img = wrap.querySelector('.slider-img');
+  const track = wrap.querySelector('.slider-track');
   const dots = wrap.querySelectorAll('.img-dot');
   
-  if (!img) return;
+  if (!track) return;
   
-  const images = JSON.parse(img.getAttribute('data-images') || '[]');
-  if (images.length === 0) return;
+  const total = parseInt(track.getAttribute('data-total') || '0', 10);
+  if (total <= 1) return;
   
-  let currentIdx = parseInt(img.getAttribute('data-idx') || '0', 10);
-  currentIdx = (currentIdx + dir + images.length) % images.length;
+  let currentIdx = parseInt(track.getAttribute('data-idx') || '0', 10);
+  currentIdx = (currentIdx + dir + total) % total;
   
-  img.src = images[currentIdx];
-  img.setAttribute('data-idx', currentIdx);
+  track.setAttribute('data-idx', currentIdx);
+  
+  const images = track.querySelectorAll('.slider-img');
+  images.forEach((img, i) => {
+    img.classList.toggle('active', i === currentIdx);
+  });
   
   dots.forEach((dot, i) => {
     dot.classList.toggle('active', i === currentIdx);

@@ -13,13 +13,14 @@ async function main() {
     
     const supabase = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
     
-    // Configuración específica de la Yamaha NMAX 2027
+    // Configuración específica de la 23ª Yamaha Crypton Fi 2027
     const productData = {
-      name: "Yamaha NMAX 2027",
+      name: "Yamaha Crypton Fi",
       type: "vehiculo",
       status: "publicado",
-      price: "$22.500.000",
-      description: "‼️Entrega Inmediata‼️\n🎨Negro Brillante\n🎨Blanco Negro\n🎨Rojo Negro\n🎨Gris Plata\n🎨Gris Mate\n🧾Se La Entrego Con Todo:\n   • Placa i\n   • Soat Pago\n   • Impuesto Pago\n   • Tarjeta De Propiedad\n\n📍ZARZAL, VALLE",
+      price: "$10.500.000",
+      description: "🎨Verde Mate, Gris Verde, Gris Azul, Gris Rojo\n🧾Se Entrega Con:\n• Placa i\n• Soat Pago\n• Tarjeta De Propiedad",
+      created_at: new Date(Date.now() - 1000 * 60 * 690).toISOString(), // 11.5 hours in the past
       metadata: { 
         category: "moto",
         year: 2027,
@@ -40,9 +41,9 @@ async function main() {
     
     console.log(`[-] Producto creado exitosamente con ID: ${product.id}`);
 
-    // 2. Subir imagen (el collage)
+    // 2. Subir imagen
     const folderPath = path.join(__dirname, '..', 'producto catologo', 'motos');
-    const file = "01-yamaha-nmax-2027.jpg";
+    const file = "23-yamaha-crypton-fi-2027-0km.jpg";
     const imagePath = path.join(folderPath, file);
     
     if (!fs.existsSync(imagePath)) {
