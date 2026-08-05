@@ -626,7 +626,8 @@ function renderMotos(appendOnly = false) {
   function getMotoBucket(m) {
     const nameLower = m.name.toLowerCase();
     if (nameLower.includes("nmax")) {
-      const is0km = m.mileage && (m.mileage.includes("0 km") || m.mileage.includes("0 Kilómetros"));
+      const mileageStr = m.mileage ? String(m.mileage).toLowerCase() : "";
+      const is0km = mileageStr.includes("0 km") || mileageStr.includes("0 kilómetros") || mileageStr.includes("0 kilometros");
       const is2027 = m.year === 2027 || m.year === "2027";
       if (is0km && is2027) return 1;
       return 2;
