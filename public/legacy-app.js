@@ -601,11 +601,16 @@ function showEmpty(grid, msg = "No hay artículos disponibles en este momento.",
 let currentMotoFilter = "todas";
 let currentMotoLimit = 12;
 
-function renderMotos() {
+function renderMotos(appendOnly = false) {
   const grid = document.getElementById("motosGrid");
   if (!grid) return;
 
-  grid.querySelectorAll(".catalog-card:not(.catalog-card--static), .catalog-empty").forEach(el => el.remove());
+  if (!appendOnly) {
+    grid.querySelectorAll(".catalog-card:not(.catalog-card--static), .catalog-empty, button.btn-card").forEach(el => el.remove());
+  } else {
+    const existingBtn = grid.querySelector("button.btn-card");
+    if (existingBtn) existingBtn.remove();
+  }
 
   let motos = vehicles.filter(v => v.type === "moto" && v.purpose === "venta");
   
@@ -617,12 +622,32 @@ function renderMotos() {
     motos = motos.filter(v => !v.name.toLowerCase().includes("nmax") && !v.name.toLowerCase().includes("crypton") && v.category !== "yamaha-nmax" && v.category !== "crypton-fi");
   }
 
+  // Sorting logic for motos
+  function getMotoBucket(m) {
+    const nameLower = m.name.toLowerCase();
+    if (nameLower.includes("nmax")) {
+      const is0km = m.mileage && (m.mileage.includes("0 km") || m.mileage.includes("0 Kilómetros"));
+      const is2027 = m.year === 2027 || m.year === "2027";
+      if (is0km && is2027) return 1;
+      return 2;
+    }
+    if (nameLower.includes("crypton")) {
+      return 3;
+    }
+    return 4;
+  }
+  
+  motos.sort((a, b) => getMotoBucket(a) - getMotoBucket(b));
+
   if (motos.length === 0) {
-    showEmpty(grid, "No hay motos disponibles en esta categoría.", true);
+    if (!appendOnly) showEmpty(grid, "No hay motos disponibles en esta categoría.", true);
     return;
   }
 
-  const paginatedMotos = motos.slice(0, currentMotoLimit);
+  const paginatedMotos = appendOnly 
+    ? motos.slice(currentMotoLimit - 12, currentMotoLimit)
+    : motos.slice(0, currentMotoLimit);
+
   paginatedMotos.forEach(m => grid.appendChild(buildVehicleCard(m)));
 
   if (motos.length > currentMotoLimit) {
@@ -635,7 +660,7 @@ function renderMotos() {
     loadMoreBtn.textContent = "Cargar más motos";
     loadMoreBtn.onclick = () => {
       currentMotoLimit += 12;
-      renderMotos();
+      renderMotos(true);
     };
     grid.appendChild(loadMoreBtn);
   }
