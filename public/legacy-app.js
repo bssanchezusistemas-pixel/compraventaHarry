@@ -258,7 +258,7 @@ let repuestosItems = [];
 let exchangeRates = [];
 
 const CATALOG_DESCRIPTIONS = {
-  motos: "Catálogo de motos en venta y servicio para vender la tuya directo a Harry.",
+  motos: "",
   carros: "Vehículos de cuatro ruedas disponibles para compra inmediata.",
   oro: "Compraventa de oro con cotización al precio real del mercado.",
   divisas: "Compra y venta de dólares y euros con tasas competitivas del día.",
@@ -298,7 +298,7 @@ function mapProductToVehicle(product) {
     type: inferVehicleSubtype(product),
     purpose: m.purpose === "alquiler" ? "alquiler" : "venta",
     year: m.year || new Date().getFullYear(),
-    mileage: m.mileage || m.kilometraje || "Consultar",
+    mileage: m.mileage || m.kilometraje || m.kilometers || "Consultar",
     price: product.price || "",
     image: getPrimaryImage(product),
     images: getAllImages(product),
@@ -406,7 +406,7 @@ async function loadData() {
 // CARD BUILDERS
 // =========================================
 function buildVehicleCard(vehicle) {
-  const msg = `¡Hola Harry! Estoy interesado en la ${vehicle.name} que vi en la página web. ¿Me podrías dar más información sobre precio y financiamiento?`;
+  const msg = `¡Hola Harry! Estoy interesado en la ${vehicle.name} que vi en la página web. ¿Me podrías dar más información?`;
   const isRental = vehicle.purpose === "alquiler";
   const waMsg = isRental
     ? `¡Hola Harry! Quiero alquilar el vehículo ${vehicle.name} por 5 días o más. ¿Me confirmas disponibilidad y precio?`
@@ -757,7 +757,7 @@ let activeTab = "motos";
 
 function updateCatalogDescription(tabId) {
   const desc = document.getElementById("catalogPageDesc");
-  if (desc && CATALOG_DESCRIPTIONS[tabId]) {
+  if (desc && CATALOG_DESCRIPTIONS[tabId] !== undefined) {
     desc.textContent = CATALOG_DESCRIPTIONS[tabId];
   }
 }

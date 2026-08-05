@@ -211,7 +211,7 @@ export default function PreviewPage() {
                           <span className="card-badge-static">Servicio Directo</span>
                         </div>
                         <div className="card-body">
-                          <h3 className="card-title">¿Quieres vender tu Moto? Directo a Harry</h3>
+                          <h3 className="card-title">¿Quieres vender tu Moto?</h3>
                           <p className="card-static-subtitle">
                             Envíanos los siguientes datos para una cotización inmediata:
                           </p>

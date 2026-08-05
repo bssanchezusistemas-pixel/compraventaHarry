@@ -87,12 +87,8 @@ function buildMetadata(form: typeof emptyForm): Record<string, unknown> {
 
   if (form.brand.trim()) metadata.brand = form.brand.trim();
   if (form.modelYear) metadata.model_year = Number(form.modelYear);
-  if (form.kilometers) metadata.kilometers = Number(form.kilometers);
+  if (form.kilometers) metadata.mileage = form.kilometers;
   if (form.paperUntil.trim()) metadata.paper_until = form.paperUntil.trim();
-
-  if (vehicleType === "moto" && form.cc) {
-    metadata.cc = form.cc;
-  }
 
   if (vehicleType === "carro") {
     if (form.transmission) metadata.transmission = form.transmission;
@@ -482,11 +478,11 @@ export default function AdminDashboard() {
                 <label htmlFor="kilometers">Kilómetros</label>
                 <input
                   id="kilometers"
-                  type="number"
-                  min={0}
+                  type="text"
+                  inputMode="numeric"
                   value={form.kilometers}
                   onChange={(e) => setForm({ ...form, kilometers: e.target.value })}
-                  placeholder="12500"
+                  placeholder="12.500"
                 />
               </div>
               <div className="admin-field">
@@ -498,23 +494,6 @@ export default function AdminDashboard() {
                   placeholder="Marzo 2027"
                 />
               </div>
-              {(form.category === "moto" || (form.category === "alquiler" && form.vehicleType === "moto")) && (
-                <div className="admin-field">
-                  <label htmlFor="cc">Cilindraje</label>
-                  <select
-                    id="cc"
-                    value={form.cc}
-                    onChange={(e) => setForm({ ...form, cc: e.target.value })}
-                  >
-                    <option value="">Seleccionar…</option>
-                    {CC_OPTIONS.map((cc) => (
-                      <option key={cc} value={cc}>
-                        {cc === "other" ? "Otro" : cc}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
               {(form.category === "carro" || (form.category === "alquiler" && form.vehicleType === "carro")) && (
                 <>
                   <div className="admin-field">
