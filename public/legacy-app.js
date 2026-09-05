@@ -316,7 +316,9 @@ function mapProductToGold(product) {
     id: product.id,
     name: product.name,
     karats: m.karats || m.kilate || m.quilates || "Oro 18k",
-    weight: m.weight || m.peso || m.medidas || "",
+    weight: m.weight || m.peso || "",
+    length: m.length || m.medidas || m.size || "",
+    origin: m.origin || "",
     description: product.description || "",
     price: product.price || "",
     image: getPrimaryImage(product),
@@ -482,7 +484,12 @@ function buildGoldCard(item) {
 
   const lines = item.description ? item.description.split('\n').map(l => l.trim()).filter(Boolean) : [];
   const spec1 = item.karats || "Oro 18k";
-  const spec2 = lines[1] ? lines[1].replace(/[💲📏]/g, '').trim() : (lines[0] ? lines[0].replace(/[💲📏🇨🇴🇮🇹]/g, '').trim() : "Garantizado");
+  let spec2 = item.weight ? (item.weight + (item.length ? ` · ${item.length}` : '')) : '';
+  if (!spec2) {
+    spec2 = lines[1] ? lines[1].replace(/[💲📏]/g, '').trim() : (lines[0] ? lines[0].replace(/[💲📏🇨🇴🇮🇹]/g, '').trim() : "Garantizado");
+  }
+
+  const formattedPrice = item.price ? (item.price.startsWith('$') ? item.price : '$' + item.price) : 'Consultar';
 
   const card = document.createElement("article");
   card.className = "catalog-card reveal active";
@@ -499,7 +506,7 @@ function buildGoldCard(item) {
       </div>
       <div class="card-price-wrap">
         <span class="price-label">Precio</span>
-        <span class="price-tag">${item.price}</span>
+        <span class="price-tag">${formattedPrice}</span>
       </div>
       <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="btn-card">
         Consultar Disponibilidad
@@ -633,24 +640,30 @@ function renderMotos(appendOnly = false) {
   let motos = vehicles.filter(v => v.type === "moto" && v.purpose === "venta");
   
   if (currentMotoFilter === "nmax") {
-    motos = motos.filter(v => v.name.toLowerCase().includes("nmax") || v.category === "yamaha-nmax");
+    motos = motos.filter(v => {
+      const clean = v.name.toLowerCase().replace(/\s+/g, "");
+      return clean.includes("nmax") || v.category === "yamaha-nmax";
+    });
   } else if (currentMotoFilter === "crypton") {
     motos = motos.filter(v => v.name.toLowerCase().includes("crypton") || v.category === "crypton-fi");
   } else if (currentMotoFilter === "otras") {
-    motos = motos.filter(v => !v.name.toLowerCase().includes("nmax") && !v.name.toLowerCase().includes("crypton") && v.category !== "yamaha-nmax" && v.category !== "crypton-fi");
+    motos = motos.filter(v => {
+      const clean = v.name.toLowerCase().replace(/\s+/g, "");
+      return !clean.includes("nmax") && !clean.includes("crypton") && v.category !== "yamaha-nmax" && v.category !== "crypton-fi";
+    });
   }
 
   // Sorting logic for motos
   function getMotoBucket(m) {
-    const nameLower = m.name.toLowerCase();
-    if (nameLower.includes("nmax")) {
+    const cleanName = m.name.toLowerCase().replace(/\s+/g, "");
+    if (cleanName.includes("nmax")) {
       const mileageStr = m.mileage ? String(m.mileage).toLowerCase() : "";
       const is0km = mileageStr.includes("0 km") || mileageStr.includes("0 kilómetros") || mileageStr.includes("0 kilometros");
       const is2027 = m.year === 2027 || m.year === "2027";
       if (is0km && is2027) return 1;
       return 2;
     }
-    if (nameLower.includes("crypton")) {
+    if (cleanName.includes("crypton")) {
       return 3;
     }
     return 4;
