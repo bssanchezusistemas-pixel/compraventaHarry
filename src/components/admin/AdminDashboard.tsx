@@ -86,8 +86,14 @@ function buildMetadata(form: typeof emptyForm): Record<string, unknown> {
   };
 
   if (form.brand.trim()) metadata.brand = form.brand.trim();
-  if (form.modelYear) metadata.model_year = Number(form.modelYear);
-  if (form.kilometers) metadata.mileage = form.kilometers;
+  if (form.modelYear) {
+    metadata.model_year = Number(form.modelYear);
+    metadata.year = Number(form.modelYear);
+  }
+  if (form.kilometers) {
+    metadata.mileage = form.kilometers;
+    metadata.kilometers = form.kilometers;
+  }
   if (form.paperUntil.trim()) metadata.paper_until = form.paperUntil.trim();
 
   if (vehicleType === "carro") {
@@ -177,8 +183,8 @@ export default function AdminDashboard() {
       price: product.price || "",
       description: product.description || "",
       brand: typeof m.brand === "string" ? m.brand : "",
-      modelYear: m.model_year != null ? String(m.model_year) : "",
-      kilometers: m.kilometers != null ? String(m.kilometers) : "",
+      modelYear: (m.model_year ?? m.year) != null ? String(m.model_year ?? m.year) : "",
+      kilometers: (m.kilometers ?? m.mileage ?? m.kilometraje) != null ? String(m.kilometers ?? m.mileage ?? m.kilometraje) : "",
       paperUntil: typeof m.paper_until === "string" ? m.paper_until : "",
       cc: typeof m.cc === "string" ? m.cc : "",
       transmission: typeof m.transmission === "string" ? m.transmission : "",

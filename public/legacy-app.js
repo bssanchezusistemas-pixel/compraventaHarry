@@ -302,7 +302,7 @@ function mapProductToVehicle(product) {
     category: m.category || "general",
     type: inferVehicleSubtype(product),
     purpose: m.purpose === "alquiler" ? "alquiler" : "venta",
-    year: m.year || new Date().getFullYear(),
+    year: m.year || m.model_year || m.año || new Date().getFullYear(),
     mileage: m.mileage || m.kilometraje || m.kilometers || "Consultar",
     price: product.price || "",
     image: getPrimaryImage(product),
