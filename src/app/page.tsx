@@ -324,6 +324,11 @@ export default function PreviewPage() {
                         </div>
                       </div>
 
+                      {/* ② Piezas de oro disponibles */}
+                      <div className="oro-buy-wrap" style={{ marginTop: "2.5rem" }}>
+                        <h3 className="oro-buy-subtitle">Piezas Disponibles</h3>
+                        <div className="oro-buy-grid" id="oroGrid" />
+                      </div>
                     </div>
                   </div>
                 </section>
