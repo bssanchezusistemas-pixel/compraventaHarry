@@ -6,7 +6,16 @@ const FALLBACK_URL = "https://crvvcnzrwbxdzgifiblc.supabase.co";
 const FALLBACK_ANON_KEY = "sb_publishable_mJuWmV6WxWQgGVDvVPzevA_3EzM82fa";
 
 export function getSupabaseConfig() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || FALLBACK_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() || FALLBACK_ANON_KEY;
+  let url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  let key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
+
+  if (!url || url.includes("vfrmlqwjpiqtyxokawir")) {
+    url = FALLBACK_URL;
+    key = FALLBACK_ANON_KEY;
+  }
+  if (!key || key.includes("C-l5PIaF32zHqhQRMFXoAA")) {
+    key = FALLBACK_ANON_KEY;
+  }
+
   return { url, key };
 }
