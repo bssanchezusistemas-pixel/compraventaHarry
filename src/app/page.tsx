@@ -284,51 +284,47 @@ export default function PreviewPage() {
                       <h2 className="section-title">Compraventa de Oro</h2>
                     </header>
 
-                    <div className="oro-layout">
-                      <div className="oro-sell-card">
-                        <div className="oro-sell-image-wrap">
-                          <div className="oro-sell-overlay" />
-                          <span className="oro-sell-badge">Compra Premium</span>
-                          <h3 className="oro-sell-title-overlay">Compramos tu Oro al mejor precio</h3>
+                    <div className="catalog-grid" id="oroGrid">
+                      <article className="catalog-card catalog-card--static">
+                        <div className="card-img-wrap">
+                          <div className="card-overlay" />
+                          <div className="card-img-placeholder" style={{ background: "linear-gradient(135deg, #1f1b14 0%, #121212 100%)", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                            <span style={{ fontSize: "3rem" }}>✨🪙</span>
+                          </div>
+                          <span className="card-badge-static">Servicio Directo</span>
                         </div>
-                        <div className="oro-sell-body">
-                          <p className="oro-sell-desc">
-                            Envíanos los datos de tu pieza y recibe una oferta competitiva basada en el
-                            precio real del mercado:
+                        <div className="card-body">
+                          <h3 className="card-title">¿Quieres vender tu Oro?</h3>
+                          <p className="card-static-subtitle">
+                            Envíanos los siguientes datos para una cotización inmediata al mejor precio:
                           </p>
                           <ul className="card-bullets">
                             <li>
-                              <span><IconZap /></span> Fotos nítidas de la pieza
+                              <span><IconCheck /></span> Fotos nítidas de la pieza
                             </li>
                             <li>
-                              <span><IconZap /></span> Color del oro
+                              <span><IconCheck /></span> Color del oro
                             </li>
                             <li>
-                              <span><IconZap /></span> Precio estimado
+                              <span><IconCheck /></span> Precio pretendido
                             </li>
                             <li>
-                              <span><IconZap /></span> Kilates
+                              <span><IconCheck /></span> Kilates estimados
                             </li>
                             <li>
-                              <span><IconZap /></span> Centímetros / Medidas
+                              <span><IconCheck /></span> Centímetros / Medidas
                             </li>
                           </ul>
                           <a
                             href="https://wa.me/573127622440?text=Hola%20Harry%2C%20quiero%20vender%20una%20pieza%20de%20oro.%20Tengo%20listos%20los%20datos%3A%20fotos%2C%20color%2C%20precio%2C%20kilates%20y%20cent%C3%ADmetros."
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="btn-card"
+                            className="btn-card btn-card--static"
                           >
-                            Cotizar mi Oro
+                            Cotizar mi Oro por WhatsApp
                           </a>
                         </div>
-                      </div>
-
-                      {/* ② Piezas de oro disponibles */}
-                      <div className="oro-buy-wrap" style={{ marginTop: "2.5rem" }}>
-                        <h3 className="oro-buy-subtitle">Piezas Disponibles</h3>
-                        <div className="oro-buy-grid" id="oroGrid" />
-                      </div>
+                      </article>
                     </div>
                   </div>
                 </section>

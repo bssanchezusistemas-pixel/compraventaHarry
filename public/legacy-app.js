@@ -470,37 +470,39 @@ function buildVehicleCard(vehicle) {
 
 function buildGoldCard(item) {
   const descText = item.description ? item.description.replace(/\n/g, ' ') : '';
-  const msg = `¡Hola Harry! Estoy interesado en la pieza de oro: ${item.name} (${item.price || ''}) ${descText}. ¿Me puedes compartir fotos y detalles?`;
+  const msg = `¡Hola Harry! Estoy interesado en la pieza de oro: ${item.name} (${item.price || ''}) ${descText}. ¿Me podrías dar más información?`;
   const waUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(msg)}`;
 
-  const imgBlock = item.image
-    ? `<img src="${item.image}" alt="${item.name}" loading="lazy">`
-    : `<div class="card-img-placeholder" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; min-height:200px; background:linear-gradient(135deg, rgba(212,175,55,0.15) 0%, rgba(20,20,20,0.95) 100%); border:1px dashed rgba(212,175,55,0.35); border-radius:12px; padding:1.25rem; text-align:center;">
-        <span style="font-size:2.75rem; margin-bottom:0.35rem; filter:drop-shadow(0 0 8px rgba(212,175,55,0.5));">✨🪙</span>
-        <span style="font-size:0.8rem; font-weight:700; color:#d4af37; text-transform:uppercase; letter-spacing:0.05em;">Oro Garantizado</span>
-        <span style="font-size:0.75rem; color:#9ca3af; margin-top:0.25rem;">Fotos disponibles por WhatsApp</span>
-      </div>`;
+  let imgHTML = '';
+  if (item.image) {
+    imgHTML = `<img src="${item.image}" alt="${item.name}" loading="lazy">`;
+  } else {
+    imgHTML = `<div class="card-img-placeholder"><span>🪙</span><p>Fotos por WhatsApp</p></div>`;
+  }
 
-  const descBlock = item.description
-    ? `<div style="font-size:0.825rem; color:#d1d5db; margin:0.5rem 0; line-height:1.4; white-space:pre-line; background:rgba(255,255,255,0.03); padding:0.5rem 0.75rem; border-radius:8px; border-left:2px solid #d4af37;">${item.description}</div>`
-    : '';
+  const lines = item.description ? item.description.split('\n').map(l => l.trim()).filter(Boolean) : [];
+  const spec1 = item.karats || "Oro 18k";
+  const spec2 = lines[1] ? lines[1].replace(/[💲📏]/g, '').trim() : (lines[0] ? lines[0].replace(/[💲📏🇨🇴🇮🇹]/g, '').trim() : "Garantizado");
 
   const card = document.createElement("article");
-  card.className = "catalog-card gold-card reveal active";
+  card.className = "catalog-card reveal active";
   card.innerHTML = `
-    <div class="card-img-wrap" style="position:relative; overflow:hidden;">
+    <div class="card-img-wrap">
       <div class="card-overlay"></div>
-      ${imgBlock}
+      ${imgHTML}
     </div>
     <div class="card-body">
-      <h3 class="card-title" style="color:#fff; font-size:1.15rem; font-weight:700;">${item.name}</h3>
-      ${descBlock}
-      <div class="card-price-wrap" style="margin-top:0.75rem;">
-        <span class="price-label">Precio</span>
-        <span class="price-tag" style="color:#d4af37; font-weight:800; font-size:1.25rem;">${item.price}</span>
+      <h3 class="card-title">${item.name}</h3>
+      <div class="card-specs">
+        <span class="spec-badge">${spec1}</span>
+        <span class="spec-badge">${spec2}</span>
       </div>
-      <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="btn-card" style="margin-top:0.75rem;">
-        Consultar / Pedir Fotos
+      <div class="card-price-wrap">
+        <span class="price-label">Precio</span>
+        <span class="price-tag">${item.price}</span>
+      </div>
+      <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="btn-card">
+        Consultar Disponibilidad
       </a>
     </div>
   `;
@@ -701,12 +703,9 @@ function renderOro() {
   const grid = document.getElementById("oroGrid");
   if (!grid) return;
 
+  const staticCard = grid.querySelector(".catalog-card--static");
   grid.innerHTML = "";
-
-  if (goldItems.length === 0) {
-    showEmpty(grid, "No hay piezas de oro disponibles en este momento.");
-    return;
-  }
+  if (staticCard) grid.appendChild(staticCard);
 
   goldItems.forEach(g => grid.appendChild(buildGoldCard(g)));
 }
@@ -925,7 +924,12 @@ function refreshAllGrids() {
     renderMotos();
   }
   if (carrosGrid) { carrosGrid.innerHTML = ""; renderCarros(); }
-  if (oroGrid) { oroGrid.innerHTML = ""; renderOro(); }
+  if (oroGrid) {
+    const staticCard = oroGrid.querySelector(".catalog-card--static");
+    oroGrid.innerHTML = "";
+    if (staticCard) oroGrid.appendChild(staticCard);
+    renderOro();
+  }
   if (alquilerGrid) { alquilerGrid.innerHTML = ""; renderAlquiler(); }
 
   const tramitesGrid = document.getElementById("tramitesGrid");
