@@ -73,9 +73,12 @@ export default function HomeHero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cueRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const bottomStatusRef = useRef<HTMLDivElement>(null);
   const framesRef = useRef<HTMLImageElement[]>([]);
   const currentFrameRef = useRef(-1);
   const [loaded, setLoaded] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [loadProgress, setLoadProgress] = useState(0);
 
   const drawFrame = useCallback((index: number) => {
     const canvas = canvasRef.current;
@@ -148,6 +151,13 @@ export default function HomeHero() {
 
     const isPortrait = window.innerHeight > window.innerWidth * 1.05;
 
+    let loadedCount = 0;
+    const updateProgress = (count: number) => {
+      if (cancelled) return;
+      const pct = Math.min(100, Math.round((count / FRAME_COUNT) * 100));
+      setLoadProgress(pct);
+    };
+
     const loadFrame = (index: number) =>
       new Promise<void>((resolve) => {
         const img = new Image();
@@ -156,19 +166,30 @@ export default function HomeHero() {
         img.onload = () => {
           if (!cancelled) {
             frames[index] = img;
-            if (index === 0) drawFrame(0);
+            loadedCount++;
+            if (index === 0) {
+              drawFrame(0);
+              // Desvanecer el loader central de forma elegante tras renderizar el primer cuadro
+              setTimeout(() => {
+                if (!cancelled) setIsInitialLoading(false);
+              }, 400);
+            }
           }
           resolve();
         };
-        img.onerror = () => resolve();
+        img.onerror = () => {
+          loadedCount++;
+          resolve();
+        };
       });
 
     const preload = async () => {
       // Cargar primer frame de inmediato
       await loadFrame(0);
+      updateProgress(1);
 
       // Pequeña pausa para permitir que la página y otros assets vitales se hidraten primero
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 80));
 
       // Cargar en lotes más pequeños para no ahogar la red de golpe
       const batchSize = 12;
@@ -178,17 +199,25 @@ export default function HomeHero() {
         await Promise.all(
           Array.from({ length: end - start }, (_, i) => loadFrame(start + i))
         );
+        updateProgress(loadedCount);
         // Pequeño respiro entre lotes
-        await new Promise((resolve) => setTimeout(resolve, 50));
+        await new Promise((resolve) => setTimeout(resolve, 40));
       }
 
       if (!cancelled) {
         framesRef.current = frames;
         setLoaded(true);
+        setLoadProgress(100);
+        setIsInitialLoading(false);
         drawFrame(currentFrameRef.current >= 0 ? currentFrameRef.current : 0);
         ScrollTrigger.refresh();
       }
     };
+
+    // Temporizador de seguridad para quitar el loader en caso de lentitud extrema de red
+    const safetyTimer = setTimeout(() => {
+      if (!cancelled) setIsInitialLoading(false);
+    }, 5000);
 
     preload();
     resizeCanvas();
@@ -212,6 +241,10 @@ export default function HomeHero() {
             cueRef.current.style.opacity = String(Math.max(0, 0.75 - p * 2.2));
           }
 
+          if (bottomStatusRef.current) {
+            bottomStatusRef.current.style.opacity = String(Math.max(0, 0.75 - p * 2.2));
+          }
+
           if (overlayRef.current) {
             const fade =
               p <= LOGO_HOLD_PROGRESS
@@ -233,6 +266,7 @@ export default function HomeHero() {
 
     return () => {
       cancelled = true;
+      clearTimeout(safetyTimer);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("load", onResize);
       ctx.revert();
@@ -256,15 +290,70 @@ export default function HomeHero() {
           />
         </div>
 
-        {!loaded && (
-          <div className="home-hero__loader" aria-hidden="true">
-            <span className="home-hero__loader-bar" />
+        {/* Pantalla y animación elegante de carga para evitar pantalla oscura vacía */}
+        <div
+          className={`home-hero__loading-screen ${!isInitialLoading ? "is-hidden" : ""}`}
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <div className="home-hero__loading-card">
+            <div className="home-hero__loading-gauge">
+              <div className="home-hero__loading-ring home-hero__loading-ring--outer" />
+              <div className="home-hero__loading-ring home-hero__loading-ring--inner" />
+              <div className="home-hero__loading-icon">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor">
+                  <path
+                    d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"
+                    stroke="#DC2626"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                  />
+                  <circle cx="12" cy="12" r="3.5" fill="#DC2626" />
+                </svg>
+              </div>
+            </div>
+
+            <div className="home-hero__loading-info">
+              <span className="home-hero__loading-badge">COMPRAVENTA HARRY</span>
+              <h2 className="home-hero__loading-title">Cargando Escena</h2>
+              <p className="home-hero__loading-subtitle">
+                Preparando experiencia interactiva 3D...
+              </p>
+
+              <div className="home-hero__loading-progress-bar">
+                <span
+                  className="home-hero__loading-progress-fill"
+                  style={{ width: `${Math.max(10, loadProgress)}%` }}
+                />
+              </div>
+
+              <div className="home-hero__loading-meta">
+                <span className="home-hero__loading-pulse-dot" />
+                <span className="home-hero__loading-pct">
+                  {loadProgress > 0 ? `${loadProgress}%` : "Iniciando..."}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Indicador inferior sutil mientras se terminan de almacenar los 240 cuadros en memoria */}
+        {!loaded && !isInitialLoading && (
+          <div ref={bottomStatusRef} className="home-hero__buffer-status" aria-hidden="true">
+            <span className="home-hero__buffer-spinner" />
+            <span className="home-hero__buffer-text">
+              Cargando fluidez 3D · {loadProgress}%
+            </span>
           </div>
         )}
 
         <div ref={overlayRef} className="home-hero__fade" aria-hidden="true" />
 
-        <div ref={cueRef} className="hero-scroll-cue home-hero__cue" aria-hidden="true">
+        <div
+          ref={cueRef}
+          className={`hero-scroll-cue home-hero__cue ${!isInitialLoading ? "is-ready" : ""}`}
+          aria-hidden="true"
+        >
           <span>Desliza hacia abajo</span>
           <div className="hero-scroll-arrow" />
         </div>
