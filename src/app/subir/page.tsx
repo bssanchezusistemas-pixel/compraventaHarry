@@ -14,6 +14,7 @@ export default function SubirRapidoPage() {
   const [publishedSuccess, setPublishedSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [currentPreviewIdx, setCurrentPreviewIdx] = useState(0);
+  const [hasAttemptedPublish, setHasAttemptedPublish] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,6 +27,7 @@ export default function SubirRapidoPage() {
     setExtracted(null);
     setPublishedSuccess(false);
     setErrorMsg("");
+    setHasAttemptedPublish(false);
   };
 
   const removeImage = (index: number) => {
@@ -45,6 +47,7 @@ export default function SubirRapidoPage() {
     }
     setIsAnalyzing(true);
     setErrorMsg("");
+    setHasAttemptedPublish(false);
 
     try {
       const formData = new FormData();
@@ -72,6 +75,18 @@ export default function SubirRapidoPage() {
 
   const handlePublish = async () => {
     if (!extracted || selectedFiles.length === 0) return;
+    setHasAttemptedPublish(true);
+
+    // Validación de campos clave requeridos
+    const missing: string[] = [];
+    if (!extracted.name?.trim()) missing.push("Nombre Comercial");
+    if (!extracted.price?.trim()) missing.push("Precio (COP)");
+
+    if (missing.length > 0) {
+      setErrorMsg(`⚠️ Faltan datos obligatorios para publicar: ${missing.join(", ")}.`);
+      return;
+    }
+
     setIsPublishing(true);
     setErrorMsg("");
 
@@ -107,15 +122,24 @@ export default function SubirRapidoPage() {
     setExtracted(null);
     setPublishedSuccess(false);
     setErrorMsg("");
+    setHasAttemptedPublish(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   // Formateador visual de precio para el mockup
   const formatDisplayPrice = (val: string) => {
-    if (!val) return "$Consultar";
+    if (!val || !val.trim()) return "$FALTA PRECIO";
     const clean = val.replace(/[^\d.,]/g, "").trim();
-    if (!clean) return "$Consultar";
+    if (!clean) return "$FALTA PRECIO";
     return clean.startsWith("$") ? clean : `$${clean}`;
+  };
+
+  // Ayudante para verificar si un campo está vacío
+  const isFieldMissing = (val: unknown) => {
+    if (val === undefined || val === null) return true;
+    if (typeof val === "string" && !val.trim()) return true;
+    if (typeof val === "number" && isNaN(val)) return true;
+    return false;
   };
 
   return (
@@ -279,10 +303,11 @@ export default function SubirRapidoPage() {
               </button>
             </div>
 
-            {/* Mensaje de error */}
+            {/* Mensaje de error / advertencia */}
             {errorMsg && (
-              <div className="bg-red-950/60 border border-red-800/80 text-red-200 text-sm p-4 rounded-xl">
-                ⚠️ {errorMsg}
+              <div className="bg-red-950/60 border border-red-600 text-red-200 text-sm p-4 rounded-xl flex items-center gap-2 animate-in fade-in">
+                <span className="text-xl">⚠️</span>
+                <span>{errorMsg}</span>
               </div>
             )}
 
@@ -357,7 +382,9 @@ export default function SubirRapidoPage() {
 
                       <div className="card-price-wrap">
                         <span className="price-label">Precio</span>
-                        <span className="price-tag">{formatDisplayPrice(extracted.price)}</span>
+                        <span className={`price-tag ${isFieldMissing(extracted.price) ? "text-amber-400 font-normal text-base" : ""}`}>
+                          {formatDisplayPrice(extracted.price)}
+                        </span>
                       </div>
 
                       <button
@@ -375,7 +402,7 @@ export default function SubirRapidoPage() {
                 <div className="lg:col-span-7 bg-[#121217] border border-zinc-800 rounded-2xl p-5 shadow-2xl flex flex-col justify-between">
                   <div className="flex flex-col gap-4">
                     <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-                      <h3 className="text-sm font-black uppercase tracking-wider text-red-400 flex items-center gap-2">
+                      <h3 className="text-sm font-black uppercase tracking-wider text-zinc-200 flex items-center gap-2">
                         <span>✏️ Datos Detectados (Edita si es necesario)</span>
                       </h3>
                       <span className="text-[11px] bg-zinc-800 text-zinc-300 px-2.5 py-1 rounded-full font-bold uppercase">
@@ -384,30 +411,55 @@ export default function SubirRapidoPage() {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      {/* NOMBRE COMERCIAL */}
                       <div className="sm:col-span-2">
-                        <label className="text-zinc-400 block mb-1 font-semibold">Nombre Comercial</label>
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="text-zinc-300 font-semibold">Nombre Comercial</label>
+                          {isFieldMissing(extracted.name) && (
+                            <span className="text-[10px] font-bold text-red-400 flex items-center gap-1">
+                              ● Falta información
+                            </span>
+                          )}
+                        </div>
                         <input
                           type="text"
                           value={extracted.name}
                           onChange={(e) => setExtracted({ ...extracted, name: e.target.value })}
-                          className="w-full bg-zinc-950 border border-zinc-700 rounded-lg p-2.5 text-white font-bold focus:border-red-500 focus:outline-none"
+                          className={`w-full bg-zinc-950 rounded-lg p-2.5 text-white font-bold transition focus:outline-none ${
+                            isFieldMissing(extracted.name)
+                              ? "border-2 border-red-500/80 bg-red-950/20 text-red-200 placeholder-red-400/50 shadow-[0_0_12px_rgba(239,68,68,0.2)]"
+                              : "border border-zinc-700 focus:border-red-500"
+                          }`}
                           placeholder="Ej: Yamaha YZ 85 o Tobillera Oro Rústico"
                         />
                       </div>
 
+                      {/* PRECIO */}
                       <div>
-                        <label className="text-zinc-400 block mb-1 font-semibold">Precio (COP)</label>
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="text-zinc-300 font-semibold">Precio (COP)</label>
+                          {isFieldMissing(extracted.price) && (
+                            <span className="text-[10px] font-bold text-red-400 flex items-center gap-1">
+                              ● Falta precio
+                            </span>
+                          )}
+                        </div>
                         <input
                           type="text"
                           value={extracted.price}
                           onChange={(e) => setExtracted({ ...extracted, price: e.target.value })}
-                          className="w-full bg-zinc-950 border border-zinc-700 rounded-lg p-2.5 text-red-400 font-bold focus:border-red-500 focus:outline-none"
+                          className={`w-full bg-zinc-950 rounded-lg p-2.5 font-bold transition focus:outline-none ${
+                            isFieldMissing(extracted.price)
+                              ? "border-2 border-red-500/90 bg-red-950/20 text-red-300 placeholder-red-400/60 shadow-[0_0_12px_rgba(239,68,68,0.25)]"
+                              : "border border-zinc-700 text-red-400 focus:border-red-500"
+                          }`}
                           placeholder="Ej. 3.200.000 o 9.800.000"
                         />
                       </div>
 
+                      {/* CATEGORIA */}
                       <div>
-                        <label className="text-zinc-400 block mb-1 font-semibold">Categoría Web</label>
+                        <label className="text-zinc-300 block mb-1 font-semibold">Categoría Web</label>
                         <select
                           value={extracted.category}
                           onChange={(e) => {
@@ -430,7 +482,12 @@ export default function SubirRapidoPage() {
                       {extracted.category === "oro" && (
                         <>
                           <div>
-                            <label className="text-zinc-400 block mb-1 font-semibold">Kilates (Badge 1)</label>
+                            <div className="flex justify-between items-center mb-1">
+                              <label className="text-zinc-300 font-semibold">Kilates</label>
+                              {isFieldMissing(extracted.karats) && (
+                                <span className="text-[10px] font-bold text-amber-400">● Opcional / Sugerido</span>
+                              )}
+                            </div>
                             <input
                               type="text"
                               value={extracted.karats || "Oro 18k"}
@@ -440,13 +497,22 @@ export default function SubirRapidoPage() {
                             />
                           </div>
                           <div>
-                            <label className="text-zinc-400 block mb-1 font-semibold">Peso / Medida (Badge 2)</label>
+                            <div className="flex justify-between items-center mb-1">
+                              <label className="text-zinc-300 font-semibold">Peso / Medida</label>
+                              {isFieldMissing(extracted.weight) && (
+                                <span className="text-[10px] font-bold text-red-400">● Falta peso</span>
+                              )}
+                            </div>
                             <input
                               type="text"
                               value={extracted.weight || ""}
                               onChange={(e) => setExtracted({ ...extracted, weight: e.target.value })}
                               placeholder="Ej: 7,6 Gr · 28 Cm"
-                              className="w-full bg-zinc-950 border border-zinc-700 rounded-lg p-2.5 text-white focus:border-red-500 focus:outline-none"
+                              className={`w-full bg-zinc-950 rounded-lg p-2.5 text-white transition focus:outline-none ${
+                                isFieldMissing(extracted.weight)
+                                  ? "border-2 border-red-500/80 bg-red-950/20 text-red-200 placeholder-red-400/50"
+                                  : "border border-zinc-700 focus:border-red-500"
+                              }`}
                             />
                           </div>
                         </>
@@ -456,27 +522,50 @@ export default function SubirRapidoPage() {
                       {(extracted.category === "moto" || extracted.category === "carro" || extracted.category === "alquiler") && (
                         <>
                           <div>
-                            <label className="text-zinc-400 block mb-1 font-semibold">Año / Modelo</label>
+                            <div className="flex justify-between items-center mb-1">
+                              <label className="text-zinc-300 font-semibold">Año / Modelo</label>
+                              {isFieldMissing(extracted.model_year) && (
+                                <span className="text-[10px] font-bold text-red-400">● Falta año</span>
+                              )}
+                            </div>
                             <input
                               type="number"
                               value={extracted.model_year || ""}
-                              onChange={(e) => setExtracted({ ...extracted, model_year: Number(e.target.value) })}
+                              onChange={(e) => setExtracted({ ...extracted, model_year: e.target.value ? Number(e.target.value) : undefined })}
                               placeholder="Ej. 2027"
-                              className="w-full bg-zinc-950 border border-zinc-700 rounded-lg p-2.5 text-white focus:border-red-500 focus:outline-none"
+                              className={`w-full bg-zinc-950 rounded-lg p-2.5 text-white transition focus:outline-none ${
+                                isFieldMissing(extracted.model_year)
+                                  ? "border-2 border-red-500/80 bg-red-950/20 text-red-200 placeholder-red-400/50"
+                                  : "border border-zinc-700 focus:border-red-500"
+                              }`}
                             />
                           </div>
                           <div>
-                            <label className="text-zinc-400 block mb-1 font-semibold">Kilometraje</label>
+                            <div className="flex justify-between items-center mb-1">
+                              <label className="text-zinc-300 font-semibold">Kilometraje</label>
+                              {isFieldMissing(extracted.kilometers) && (
+                                <span className="text-[10px] font-bold text-red-400">● Falta km</span>
+                              )}
+                            </div>
                             <input
                               type="text"
                               value={extracted.kilometers || ""}
                               onChange={(e) => setExtracted({ ...extracted, kilometers: e.target.value })}
                               placeholder="Ej. 0 km o 10.000 km"
-                              className="w-full bg-zinc-950 border border-zinc-700 rounded-lg p-2.5 text-white focus:border-red-500 focus:outline-none"
+                              className={`w-full bg-zinc-950 rounded-lg p-2.5 text-white transition focus:outline-none ${
+                                isFieldMissing(extracted.kilometers)
+                                  ? "border-2 border-red-500/80 bg-red-950/20 text-red-200 placeholder-red-400/50"
+                                  : "border border-zinc-700 focus:border-red-500"
+                              }`}
                             />
                           </div>
                           <div className="sm:col-span-2">
-                            <label className="text-zinc-400 block mb-1 font-semibold">Papeles Hasta</label>
+                            <div className="flex justify-between items-center mb-1">
+                              <label className="text-zinc-300 font-semibold">Papeles Hasta</label>
+                              {isFieldMissing(extracted.paper_until) && (
+                                <span className="text-[10px] font-bold text-amber-400/90">● Opcional (Vacío si no aplica)</span>
+                              )}
+                            </div>
                             <input
                               type="text"
                               value={extracted.paper_until || ""}
@@ -489,7 +578,7 @@ export default function SubirRapidoPage() {
                       )}
 
                       <div className="sm:col-span-2">
-                        <label className="text-zinc-400 block mb-1 font-semibold">Descripción o Detalles</label>
+                        <label className="text-zinc-300 block mb-1 font-semibold">Descripción o Detalles</label>
                         <textarea
                           value={extracted.description || ""}
                           onChange={(e) => setExtracted({ ...extracted, description: e.target.value })}
