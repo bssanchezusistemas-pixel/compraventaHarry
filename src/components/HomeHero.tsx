@@ -73,7 +73,6 @@ export default function HomeHero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cueRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
-  const bottomStatusRef = useRef<HTMLDivElement>(null);
   const framesRef = useRef<HTMLImageElement[]>([]);
   const currentFrameRef = useRef(-1);
   const [loaded, setLoaded] = useState(false);
@@ -169,10 +168,6 @@ export default function HomeHero() {
             loadedCount++;
             if (index === 0) {
               drawFrame(0);
-              // Desvanecer el loader central de forma elegante tras renderizar el primer cuadro
-              setTimeout(() => {
-                if (!cancelled) setIsInitialLoading(false);
-              }, 400);
             }
           }
           resolve();
@@ -184,14 +179,14 @@ export default function HomeHero() {
       });
 
     const preload = async () => {
-      // Cargar primer frame de inmediato
+      // Cargar primer frame de inmediato y dibujarlo de fondo
       await loadFrame(0);
       updateProgress(1);
 
-      // Pequeña pausa para permitir que la página y otros assets vitales se hidraten primero
-      await new Promise((resolve) => setTimeout(resolve, 80));
+      // Pequeña pausa para permitir hidratación inicial fluida
+      await new Promise((resolve) => setTimeout(resolve, 60));
 
-      // Cargar en lotes más pequeños para no ahogar la red de golpe
+      // Cargar en lotes controlados
       const batchSize = 12;
       for (let start = 1; start < FRAME_COUNT; start += batchSize) {
         if (cancelled) return;
@@ -201,23 +196,32 @@ export default function HomeHero() {
         );
         updateProgress(loadedCount);
         // Pequeño respiro entre lotes
-        await new Promise((resolve) => setTimeout(resolve, 40));
+        await new Promise((resolve) => setTimeout(resolve, 30));
       }
 
       if (!cancelled) {
         framesRef.current = frames;
         setLoaded(true);
         setLoadProgress(100);
-        setIsInitialLoading(false);
-        drawFrame(currentFrameRef.current >= 0 ? currentFrameRef.current : 0);
-        ScrollTrigger.refresh();
+        // Mantener la escena hasta completar la carga al 100% y luego desvanecerla elegantemente
+        setTimeout(() => {
+          if (!cancelled) {
+            setIsInitialLoading(false);
+            drawFrame(currentFrameRef.current >= 0 ? currentFrameRef.current : 0);
+            ScrollTrigger.refresh();
+          }
+        }, 400);
       }
     };
 
     // Temporizador de seguridad para quitar el loader en caso de lentitud extrema de red
     const safetyTimer = setTimeout(() => {
-      if (!cancelled) setIsInitialLoading(false);
-    }, 5000);
+      if (!cancelled) {
+        setLoaded(true);
+        setIsInitialLoading(false);
+        ScrollTrigger.refresh();
+      }
+    }, 10000);
 
     preload();
     resizeCanvas();
@@ -239,10 +243,6 @@ export default function HomeHero() {
 
           if (cueRef.current) {
             cueRef.current.style.opacity = String(Math.max(0, 0.75 - p * 2.2));
-          }
-
-          if (bottomStatusRef.current) {
-            bottomStatusRef.current.style.opacity = String(Math.max(0, 0.75 - p * 2.2));
           }
 
           if (overlayRef.current) {
@@ -330,22 +330,12 @@ export default function HomeHero() {
               <div className="home-hero__loading-meta">
                 <span className="home-hero__loading-pulse-dot" />
                 <span className="home-hero__loading-pct">
-                  {loadProgress > 0 ? `${loadProgress}%` : "Iniciando..."}
+                  {loadProgress >= 100 ? "¡Listo! 100%" : (loadProgress > 0 ? `${loadProgress}%` : "Iniciando...")}
                 </span>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Indicador inferior sutil mientras se terminan de almacenar los 240 cuadros en memoria */}
-        {!loaded && !isInitialLoading && (
-          <div ref={bottomStatusRef} className="home-hero__buffer-status" aria-hidden="true">
-            <span className="home-hero__buffer-spinner" />
-            <span className="home-hero__buffer-text">
-              Cargando fluidez 3D · {loadProgress}%
-            </span>
-          </div>
-        )}
 
         <div ref={overlayRef} className="home-hero__fade" aria-hidden="true" />
 
