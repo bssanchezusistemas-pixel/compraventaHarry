@@ -2,12 +2,12 @@ import { createClient } from "@supabase/supabase-js";
 import sharp from "sharp";
 import { ExtractedProduct } from "./types";
 
-const FALLBACK_URL = "https://crvvcnzrwbxdzgifiblc.supabase.co";
-const FALLBACK_SERVICE_ROLE = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNydnZjbnpyd2J4ZHpnaWZpYmxjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MzEwODM5NSwiZXhwIjoyMDk4Njg0Mzk1fQ.18-rXBNGm2jsopoCZrIkny0199WcN3fJPQnMAVzi5xo";
-
 function getServiceSupabase() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || FALLBACK_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || FALLBACK_SERVICE_ROLE;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || "https://crvvcnzrwbxdzgifiblc.supabase.co";
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  if (!key) {
+    throw new Error("SUPABASE_SERVICE_ROLE_KEY no está configurada en las variables de entorno del servidor.");
+  }
   return createClient(url, key);
 }
 
