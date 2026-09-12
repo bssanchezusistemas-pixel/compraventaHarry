@@ -64,10 +64,7 @@ export async function publishProductFromAgent(
 
   if (insertError) {
     console.error("Supabase insert error:", insertError);
-    if (insertError.message?.includes("Invalid API key") || insertError.message?.includes("JWSError") || insertError.message?.includes("signature")) {
-      throw new Error("Clave de Supabase (SUPABASE_SERVICE_ROLE_KEY) inválida en Vercel. Copia el valor 'service_role' (secret) desde Supabase > Settings > API Keys.");
-    }
-    throw insertError;
+    throw new Error(`Error en Supabase al insertar producto: ${JSON.stringify(insertError)}`);
   }
   const productId = inserted.id;
   const imageUrls: string[] = [];
