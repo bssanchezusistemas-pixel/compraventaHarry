@@ -104,7 +104,8 @@ export default function SubirRapidoPage() {
 
       const data = await res.json();
       if (!res.ok || !data.ok) {
-        throw new Error(data.error || "Error al publicar el producto.");
+        const extra = data.debug ? ` (${data.debug})` : "";
+        throw new Error((data.error || "Error al publicar el producto.") + extra);
       }
 
       setPublishedSuccess(true);
@@ -617,6 +618,13 @@ export default function SubirRapidoPage() {
                       )}
                     </button>
                   </div>
+
+                  {errorMsg && (
+                    <div className="mt-3 bg-red-950/80 border border-red-600 text-red-200 text-xs p-3 rounded-xl flex items-center gap-2 animate-in fade-in">
+                      <span className="text-lg">⚠️</span>
+                      <span>{errorMsg}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

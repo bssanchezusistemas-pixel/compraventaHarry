@@ -48,7 +48,9 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     console.error("Draft API error details:", err);
     const detailedMessage = err?.message || String(err);
-    const keyStatus = process.env.GEMINI_API_KEY ? `GEMINI_API_KEY presente (${process.env.GEMINI_API_KEY.length} caracteres)` : "GEMINI_API_KEY NO ENCONTRADA";
+    const geminiKey = process.env.GEMINI_API_KEY?.trim() || "";
+    const sbKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
+    const keyStatus = `GEMINI: ${geminiKey ? `${geminiKey.length} chars` : 'FALTA'} | SUPABASE_SERVICE: ${sbKey ? `${sbKey.length} chars (inicia: ${sbKey.slice(0, 8)}... termina: ...${sbKey.slice(-6)})` : 'FALTA'}`;
     return NextResponse.json({ 
       error: detailedMessage,
       debug: keyStatus
