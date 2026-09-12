@@ -58,7 +58,12 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
 }
 `;
 
-  const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.5-pro"];
+  const modelsToTry = [
+    "gemini-3.5-flash",
+    "gemini-3.1-flash-lite-preview",
+    "gemini-3.5-flash-lite",
+    "gemini-2.5-flash",
+  ];
   let lastError: any = null;
   let text = "{}";
 
