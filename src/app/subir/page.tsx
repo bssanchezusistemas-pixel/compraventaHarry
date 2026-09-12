@@ -62,8 +62,7 @@ export default function SubirRapidoPage() {
 
       const data = await res.json();
       if (!res.ok || !data.ok) {
-        const extra = data.debug ? ` (${data.debug})` : "";
-        throw new Error((data.error || "No se pudo analizar el producto.") + extra);
+        throw new Error(data.error || "No se pudo analizar el producto.");
       }
 
       setExtracted(data.product);
@@ -104,8 +103,7 @@ export default function SubirRapidoPage() {
 
       const data = await res.json();
       if (!res.ok || !data.ok) {
-        const extra = data.debug ? ` (${data.debug})` : "";
-        throw new Error((data.error || "Error al publicar el producto.") + extra);
+        throw new Error(data.error || "Error al publicar el producto.");
       }
 
       setPublishedSuccess(true);

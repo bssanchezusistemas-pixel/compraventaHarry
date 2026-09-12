@@ -47,17 +47,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (err: any) {
     console.error("Draft API error details:", err);
-    const detailedMessage = err?.message || String(err);
-    const crypto = await import("crypto");
-    const geminiKey = process.env.GEMINI_API_KEY?.trim() || "";
-    const sbKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
-    const sbUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || "https://crvvcnzrwbxdzgifiblc.supabase.co";
-    const keyHash = sbKey ? crypto.createHash("sha256").update(sbKey).digest("hex").slice(0, 10) : "NONE";
-    const urlHash = sbUrl ? crypto.createHash("sha256").update(sbUrl).digest("hex").slice(0, 10) : "NONE";
-    const keyStatus = `GEMINI: ${geminiKey ? `${geminiKey.length} chars` : 'FALTA'} | SB_URL_HASH: ${urlHash} (${sbUrl}) | SB_KEY_HASH: ${keyHash} (${sbKey.length} chars, starts: ${sbKey.slice(0, 8)}... ends: ...${sbKey.slice(-6)})`;
+    const detailedMessage = err?.message || "Error interno del servidor al procesar la solicitud.";
     return NextResponse.json({ 
       error: detailedMessage,
-      debug: keyStatus
     }, { status: 500 });
   }
 }
