@@ -46,6 +46,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (err: any) {
+    console.error("Draft API error details:", err);
+    const detailedMessage = err?.message || String(err);
     const crypto = await import("crypto");
     const geminiKey = process.env.GEMINI_API_KEY?.trim() || "";
     const sbKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "";

@@ -1,13 +1,28 @@
 import { createClient } from "@supabase/supabase-js";
 import sharp from "sharp";
 import { ExtractedProduct } from "./types";
+import { getSupabaseConfig } from "../supabase/config";
 
 function getServiceSupabase() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || "https://crvvcnzrwbxdzgifiblc.supabase.co";
+  const { url: configUrl } = getSupabaseConfig();
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
   if (!key) {
     throw new Error("SUPABASE_SERVICE_ROLE_KEY no está configurada en las variables de entorno del servidor.");
   }
+
+  let url = configUrl;
+  try {
+    const parts = key.split(".");
+    if (parts.length === 3) {
+      const payload = JSON.parse(Buffer.from(parts[1], "base64").toString());
+      if (payload.ref) {
+        url = `https://${payload.ref}.supabase.co`;
+      }
+    }
+  } catch (e) {
+    console.warn("No se pudo decodificar payload de SUPABASE_SERVICE_ROLE_KEY:", e);
+  }
+
   return createClient(url, key);
 }
 
