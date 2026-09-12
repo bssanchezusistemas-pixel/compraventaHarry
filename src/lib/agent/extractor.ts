@@ -58,28 +58,56 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
 }
 `;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: [
-      {
-        role: "user",
-        parts: [
-          {
-            inlineData: {
-              data: imageBuffer.toString("base64"),
-              mimeType: mimeType || "image/jpeg",
-            },
-          },
-          { text: prompt },
-        ],
-      },
-    ],
-    config: {
-      responseMimeType: "application/json",
-    },
-  });
+  const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.5-pro"];
+  let lastError: any = null;
+  let text = "{}";
 
-  const text = response.text?.trim() || "{}";
+  for (const model of modelsToTry) {
+    try {
+      const response = await ai.models.generateContent({
+        model,
+        contents: [
+          {
+            role: "user",
+            parts: [
+              {
+                inlineData: {
+                  data: imageBuffer.toString("base64"),
+                  mimeType: mimeType || "image/jpeg",
+                },
+              },
+              { text: prompt },
+            ],
+          },
+        ],
+        config: {
+          responseMimeType: "application/json",
+        },
+      });
+
+      text = response.text?.trim() || "{}";
+      break;
+    } catch (err: any) {
+      console.warn(`Model ${model} failed, trying next:`, err.message);
+      lastError = err;
+    }
+  }
+
+  if (text === "{}" && lastError) {
+    let msg = lastError.message || String(lastError);
+    try {
+      const parsedErr = JSON.parse(msg);
+      if (parsedErr?.error?.message) msg = parsedErr.error.message;
+    } catch (_) {}
+
+    if (msg.includes("API key not valid") || msg.includes("Invalid API key") || msg.includes("API_KEY_INVALID")) {
+      throw new Error("Clave de Gemini API inválida. Verifica tu GEMINI_API_KEY en Vercel.");
+    }
+    if (msg.includes("high demand") || msg.includes("UNAVAILABLE")) {
+      throw new Error("Los servidores de IA están saturados temporalmente. Intenta de nuevo en unos segundos.");
+    }
+    throw new Error(`Error de IA: ${msg}`);
+  }
   const parsed = JSON.parse(text);
 
   return {
