@@ -46,7 +46,12 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (err: any) {
-    console.error("Draft API error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.error("Draft API error details:", err);
+    const detailedMessage = err?.message || String(err);
+    const keyStatus = process.env.GEMINI_API_KEY ? `GEMINI_API_KEY presente (${process.env.GEMINI_API_KEY.length} caracteres)` : "GEMINI_API_KEY NO ENCONTRADA";
+    return NextResponse.json({ 
+      error: detailedMessage,
+      debug: keyStatus
+    }, { status: 500 });
   }
 }

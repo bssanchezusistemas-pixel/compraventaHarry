@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useRef } from "react";
 import Image from "next/image";
@@ -62,7 +62,8 @@ export default function SubirRapidoPage() {
 
       const data = await res.json();
       if (!res.ok || !data.ok) {
-        throw new Error(data.error || "No se pudo analizar el producto.");
+        const extra = data.debug ? ` (${data.debug})` : "";
+        throw new Error((data.error || "No se pudo analizar el producto.") + extra);
       }
 
       setExtracted(data.product);
