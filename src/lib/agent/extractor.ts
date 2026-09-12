@@ -1,15 +1,16 @@
 import { GoogleGenAI } from "@google/genai";
 import { ExtractedProduct } from "./types";
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || "",
-});
-
 export async function extractProductWithAI(
   imageBuffer: Buffer,
   mimeType: string,
   userText: string = ""
 ): Promise<ExtractedProduct> {
+  const apiKey = (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || "").trim();
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY no está configurada en las variables de entorno.");
+  }
+  const ai = new GoogleGenAI({ apiKey });
   const prompt = `
 Eres un asistente experto en catalogar productos para Compraventa Harry (Colombia).
 Analiza la imagen adjunta y la descripción textual/voz del usuario: "${userText}".
