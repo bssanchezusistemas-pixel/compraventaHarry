@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { DashboardStats, Product, ProductImage, ProductStatus, ProductType } from "./types";
+import { getCdnImageUrl } from "./cdn-image";
 
 const BUCKET = "cv-product-images";
 // Tablas con prefijo cv_ porque el proyecto Supabase se comparte con otra app.
@@ -142,7 +143,29 @@ function parsePrice(price: string): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-export function getPrimaryImage(product: Product): string | null {
+/**
+ * Returns the primary image URL proxied through Vercel's Edge CDN.
+ */
+export function getPrimaryImage(
+  product: Product,
+  width: number = 640,
+  quality: number = 75
+): string | null {
   const sorted = [...(product.product_images || [])].sort((a, b) => a.sort_order - b.sort_order);
-  return sorted[0]?.url || null;
+  const rawUrl = sorted[0]?.url || null;
+  return rawUrl ? getCdnImageUrl(rawUrl, width, quality) : null;
+}
+
+/**
+ * Returns all image URLs proxied through Vercel's Edge CDN.
+ */
+export function getAllCdnImages(
+  product: Product,
+  width: number = 640,
+  quality: number = 75
+): string[] {
+  const sorted = [...(product.product_images || [])].sort((a, b) => a.sort_order - b.sort_order);
+  return sorted
+    .map((img) => getCdnImageUrl(img.url, width, quality))
+    .filter(Boolean);
 }

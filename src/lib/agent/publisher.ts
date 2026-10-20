@@ -90,8 +90,8 @@ export async function publishProductFromAgent(
   for (let i = 0; i < imagesToProcess.length; i++) {
     try {
       const optimizedBuffer = await sharp(imagesToProcess[i])
-        .resize(1600, 1600, { fit: "inside", withoutEnlargement: true })
-        .webp({ quality: 82 })
+        .resize(1000, 1000, { fit: "inside", withoutEnlargement: true })
+        .webp({ quality: 78, effort: 6 })
         .toBuffer();
 
       const filename = `${Date.now()}-${i}.webp`;

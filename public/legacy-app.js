@@ -15,9 +15,9 @@ function initSupabase() {
   let url = (window.__SUPABASE_URL || "").trim();
   let key = (window.__SUPABASE_ANON_KEY || "").trim();
 
-  if (!url || url.includes("vfrmlqwjpiqtyxokawir")) {
-    url = "https://crvvcnzrwbxdzgifiblc.supabase.co";
-    key = "sb_publishable_mJuWmV6WxWQgGVDvVPzevA_3EzM82fa";
+  if (!url || url.includes("crvvcnzrwbxdzgifiblc")) {
+    url = "https://vfrmlqwjpiqtyxokawir.supabase.co";
+    key = "sb_publishable_C-l5PIaF32zHqhQRMFXoAA_-zEyPnRJ";
   }
 
   if (url && key && url.includes("supabase.co") && key.length > 20) {
@@ -157,14 +157,31 @@ const CATALOG_DESCRIPTIONS = {
 // =========================================
 // DATA LOADING
 // =========================================
+// =========================================
+// VERCEL CDN IMAGE PROXY & CACHE
+// =========================================
+function getVercelCdnImageUrl(url, width = 640, quality = 75) {
+  if (!url || typeof url !== "string") return "";
+  const trimmed = url.trim();
+  if (!trimmed || trimmed.startsWith("data:") || trimmed.startsWith("blob:")) return trimmed;
+  if (trimmed.startsWith("/_next/image")) return trimmed;
+  if (trimmed.includes(".supabase.co/storage/v1/object/public/")) {
+    return `/_next/image?url=${encodeURIComponent(trimmed)}&w=${width}&q=${quality}`;
+  }
+  return trimmed;
+}
+
 function getPrimaryImage(product) {
   const images = (product.product_images || []).slice().sort((a, b) => a.sort_order - b.sort_order);
-  return images[0]?.url || "";
+  const rawUrl = images[0]?.url || "";
+  return getVercelCdnImageUrl(rawUrl, 640, 75);
 }
 
 function getAllImages(product) {
   const images = (product.product_images || []).slice().sort((a, b) => a.sort_order - b.sort_order);
-  return images.map(img => img.url).filter(Boolean);
+  return images
+    .map(img => getVercelCdnImageUrl(img.url, 640, 75))
+    .filter(Boolean);
 }
 
 function inferVehicleSubtype(product) {
@@ -253,15 +270,53 @@ function mapProductToExchangeRate(product) {
   };
 }
 
-async function loadData() {
-  // A petición del cliente, actualmente no se muestran productos en el catálogo
-  // y se despliega el mensaje de escribir directamente a WhatsApp
-  vehicles = [];
-  goldItems = [];
-  repuestosItems = [];
+// Control para visualización de catálogo
+let SHOW_CATALOG_PRODUCTS = true;
 
-  tramiteServices = LOCAL_TRAMITES;
-  exchangeRates = LOCAL_EXCHANGE_RATES;
+async function loadData() {
+  if (!SHOW_CATALOG_PRODUCTS) {
+    vehicles = [];
+    goldItems = [];
+    repuestosItems = [];
+    tramiteServices = LOCAL_TRAMITES;
+    exchangeRates = LOCAL_EXCHANGE_RATES;
+    return;
+  }
+
+  if (usingSupabase && supabaseClient) {
+    try {
+      const { data, error } = await supabaseClient
+        .from("cv_products")
+        .select("*, product_images:cv_product_images(*)")
+        .order("created_at", { ascending: false })
+        .eq("status", "publicado");
+
+      if (error) throw error;
+
+      const products = data || [];
+      vehicles = products.filter((p) => p.type === "vehiculo").map(mapProductToVehicle);
+      goldItems = products.filter((p) => p.type === "oro").map(mapProductToGold);
+      tramiteServices = products.filter((p) => p.type === "tramite").map(mapProductToTramite);
+      repuestosItems = products.filter((p) => p.type === "servicio").map(mapProductToRepuesto);
+      exchangeRates = products.filter((p) => p.type === "divisa").map(mapProductToExchangeRate);
+
+      if (vehicles.length === 0) vehicles = LOCAL_VEHICLES;
+      if (goldItems.length === 0) goldItems = LOCAL_GOLD;
+      if (tramiteServices.length === 0) tramiteServices = LOCAL_TRAMITES;
+      if (exchangeRates.length === 0) exchangeRates = LOCAL_EXCHANGE_RATES;
+    } catch (err) {
+      console.warn("Supabase fetch error, fallback:", err);
+      vehicles = LOCAL_VEHICLES;
+      goldItems = LOCAL_GOLD;
+      tramiteServices = LOCAL_TRAMITES;
+      exchangeRates = LOCAL_EXCHANGE_RATES;
+    }
+  } else {
+    vehicles = LOCAL_VEHICLES;
+    goldItems = LOCAL_GOLD;
+    tramiteServices = LOCAL_TRAMITES;
+    exchangeRates = LOCAL_EXCHANGE_RATES;
+  }
 }
 
 // =========================================

@@ -1,19 +1,20 @@
-// Valores de respaldo cuando las variables de entorno no están disponibles
-// (p. ej. mal configuradas en Vercel). Son credenciales PÚBLICAS por diseño:
-// la URL y la publishable/anon key se envían al navegador de cualquier visitante,
-// y la seguridad real la imponen las políticas RLS en Supabase.
-const FALLBACK_URL = "https://crvvcnzrwbxdzgifiblc.supabase.co";
-const FALLBACK_ANON_KEY = "sb_publishable_mJuWmV6WxWQgGVDvVPzevA_3EzM82fa";
+// Valores de respaldo para Supabase.
+// Son credenciales públicas de solo lectura / anon key protegidas por RLS.
+// Proyecto activo y operativo: vfrmlqwjpiqtyxokawir
+const FALLBACK_URL = "https://vfrmlqwjpiqtyxokawir.supabase.co";
+const FALLBACK_ANON_KEY = "sb_publishable_C-l5PIaF32zHqhQRMFXoAA_-zEyPnRJ";
 
 export function getSupabaseConfig() {
   let url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
   let key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
 
-  if (!url || url.includes("vfrmlqwjpiqtyxokawir")) {
+  // Si no hay variables configuradas o si apuntan al proyecto restringido por cuota (crvvcnzrwbxdzgifiblc),
+  // usamos automáticamente el proyecto activo vfrmlqwjpiqtyxokawir.
+  if (!url || url.includes("crvvcnzrwbxdzgifiblc")) {
     url = FALLBACK_URL;
     key = FALLBACK_ANON_KEY;
   }
-  if (!key || key.includes("C-l5PIaF32zHqhQRMFXoAA")) {
+  if (!key || key.includes("mJuWmV6WxWQgGVDvVPzevA")) {
     key = FALLBACK_ANON_KEY;
   }
 

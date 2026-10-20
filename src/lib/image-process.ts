@@ -1,6 +1,6 @@
 import imageCompression from "browser-image-compression";
 
-const MAX_WIDTH = 1600;
+const MAX_WIDTH = 1200;
 const WEBP_QUALITY = 0.75;
 const MAX_IMAGES = 5;
 
