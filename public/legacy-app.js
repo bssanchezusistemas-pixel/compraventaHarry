@@ -42,100 +42,7 @@ const WHATSAPP_PHONE = "573127622440";
 // =========================================
 // LOCAL FALLBACK DATA
 // =========================================
-const LOCAL_VEHICLES = [
-  // MOTOS - VENTA
-  {
-    id: 1,
-    name: "Yamaha NMAX 155 Tech Max",
-    category: "yamaha-nmax",
-    type: "moto",
-    purpose: "venta",
-    year: 2026,
-    mileage: "0 km",
-    price: "$17.400.000",
-    image: "/2026-yamaha-nmax-155-tech-max-scooter-first-look-1-768x512.webp"
-  },
-  {
-    id: 2,
-    name: "Yamaha NMAX 125 Connect",
-    category: "yamaha-nmax",
-    type: "moto",
-    purpose: "venta",
-    year: 2025,
-    mileage: "2.500 km",
-    price: "$13.900.000",
-    image: "/yamaha-nmax-125-2025-6.webp"
-  },
-  {
-    id: 3,
-    name: "Yamaha Crypton FI (Negro Mate Azul)",
-    category: "crypton-fi",
-    type: "moto",
-    purpose: "venta",
-    year: 2025,
-    mileage: "1.200 km",
-    price: "$8.400.000",
-    image: "/CRYPTON-FI_0001_CRYPTON-NEGRO-MATE-AZUL.webp"
-  },
-  {
-    id: 4,
-    name: "Yamaha Crypton FI (Negro Mate Amarillo)",
-    category: "crypton-fi",
-    type: "moto",
-    purpose: "venta",
-    year: 2025,
-    mileage: "800 km",
-    price: "$8.600.000",
-    image: "/CRYPTON-FI_0002_CRYPTON-NEGRO-MATE-AMARILLO.webp"
-  },
-  {
-    id: 5,
-    name: "Suzuki DR 650 SE (Línea Dirt)",
-    category: "linea-dirt",
-    type: "moto",
-    purpose: "venta",
-    year: 2026,
-    mileage: "0 km",
-    price: "$34.500.000",
-    image: "/linea_dirt_dr650.webp"
-  },
-  // MOTOS - ALQUILER
-  {
-    id: 6,
-    name: "Yamaha NMAX 155 (Alquiler)",
-    category: "yamaha-nmax",
-    type: "moto",
-    purpose: "alquiler",
-    year: 2025,
-    mileage: "Disponible",
-    price: "$120.000/día",
-    image: "/yamaha-nmax-125-2025-6.webp"
-  },
-  // CARROS - VENTA
-  {
-    id: 7,
-    name: "Superdeportivo Premium Red",
-    category: "carros",
-    type: "carro",
-    purpose: "venta",
-    year: 2025,
-    mileage: "1.500 km",
-    price: "$420.000.000",
-    image: "/Gemini_Generated_Image_vz65j3vz65j3vz65.webp"
-  },
-  // CARROS - ALQUILER
-  {
-    id: 8,
-    name: "SUV Sport (Alquiler)",
-    category: "carros",
-    type: "carro",
-    purpose: "alquiler",
-    year: 2024,
-    mileage: "Disponible",
-    price: "$350.000/día",
-    image: "/Gemini_Generated_Image_vz65j3vz65j3vz65.webp"
-  }
-];
+const LOCAL_VEHICLES = [];
 
 const LOCAL_TRAMITES = [
   {
@@ -228,32 +135,7 @@ const LOCAL_EXCHANGE_RATES = [
   }
 ];
 
-const LOCAL_GOLD = [
-  {
-    id: 1,
-    name: "Cadena Cubana Oro 18k",
-    karats: "18k",
-    weight: "12 gr / 60 cm",
-    price: "$4.800.000",
-    image: "/vender-moto.webp"
-  },
-  {
-    id: 2,
-    name: "Pulsera Italiana Oro 14k",
-    karats: "14k",
-    weight: "8 gr / 20 cm",
-    price: "$2.100.000",
-    image: "/vender-moto.webp"
-  },
-  {
-    id: 3,
-    name: "Anillo Sello Oro 18k",
-    karats: "18k",
-    weight: "5 gr",
-    price: "$1.350.000",
-    image: "/vender-moto.webp"
-  }
-];
+const LOCAL_GOLD = [];
 
 // Runtime stores
 let vehicles = [];
@@ -372,42 +254,14 @@ function mapProductToExchangeRate(product) {
 }
 
 async function loadData() {
-  if (usingSupabase && supabaseClient) {
-    try {
-      const { data, error } = await supabaseClient
-        .from("cv_products")
-        .select("*, product_images:cv_product_images(*)")
-        .order("created_at", { ascending: false }) // Added ordering so first uploaded/newest shows first
-        .eq("status", "publicado");
+  // A petición del cliente, actualmente no se muestran productos en el catálogo
+  // y se despliega el mensaje de escribir directamente a WhatsApp
+  vehicles = [];
+  goldItems = [];
+  repuestosItems = [];
 
-      if (error) throw error;
-
-      const products = data || [];
-      vehicles = products.filter((p) => p.type === "vehiculo").map(mapProductToVehicle);
-      goldItems = products.filter((p) => p.type === "oro").map(mapProductToGold);
-      tramiteServices = products.filter((p) => p.type === "tramite").map(mapProductToTramite);
-      repuestosItems = products.filter((p) => p.type === "servicio").map(mapProductToRepuesto);
-      exchangeRates = products.filter((p) => p.type === "divisa").map(mapProductToExchangeRate);
-
-      if (vehicles.length === 0) vehicles = LOCAL_VEHICLES;
-      if (goldItems.length === 0) goldItems = LOCAL_GOLD;
-      if (tramiteServices.length === 0) tramiteServices = LOCAL_TRAMITES;
-      if (exchangeRates.length === 0) exchangeRates = LOCAL_EXCHANGE_RATES;
-    } catch (err) {
-      console.warn("Supabase fetch failed, using local data:", err);
-      vehicles = LOCAL_VEHICLES;
-      goldItems = LOCAL_GOLD;
-      tramiteServices = LOCAL_TRAMITES;
-      repuestosItems = [];
-      exchangeRates = LOCAL_EXCHANGE_RATES;
-    }
-  } else {
-    vehicles = LOCAL_VEHICLES;
-    goldItems = LOCAL_GOLD;
-    tramiteServices = LOCAL_TRAMITES;
-    repuestosItems = [];
-    exchangeRates = LOCAL_EXCHANGE_RATES;
-  }
+  tramiteServices = LOCAL_TRAMITES;
+  exchangeRates = LOCAL_EXCHANGE_RATES;
 }
 
 // =========================================
@@ -608,15 +462,28 @@ function buildRepuestoCard(item) {
   return card;
 }
 
-function showEmpty(grid, msg = "No hay artículos disponibles en este momento.", append = false) {
-  const el = document.createElement("p");
-  el.className = "catalog-empty";
-  el.textContent = msg;
+function showEmpty(grid, msg = "No hay productos disponibles en el momento.", append = false, categoryName = "productos") {
+  const box = document.createElement("div");
+  box.className = "catalog-empty-card";
+  const waMsg = encodeURIComponent("¡Hola Harry! Vi en la página web que no hay " + categoryName + " disponibles en el momento. Quisiera consultar qué tienen disponible o si les va a llegar inventario.");
+  box.innerHTML = `
+    <div class="empty-card-inner">
+      <div class="empty-badge">Inventario en Actualización</div>
+      <div class="empty-icon-wrap">
+        <span class="empty-icon">📦</span>
+      </div>
+      <h3 class="empty-title">No hay ${categoryName} disponibles en el momento</h3>
+      <p class="empty-desc">Estamos actualizando nuestro catálogo. Si buscas una referencia en particular o deseas consultar disponibilidad inmediata, escríbenos directamente a WhatsApp.</p>
+      <a href="https://wa.me/${WHATSAPP_PHONE}?text=${waMsg}" target="_blank" rel="noopener noreferrer" class="btn-card empty-wa-btn">
+        <span class="wa-icon">💬</span> Consultar Disponibilidad por WhatsApp
+      </a>
+    </div>
+  `;
   if (append) {
-    grid.appendChild(el);
+    grid.appendChild(box);
   } else {
     grid.innerHTML = "";
-    grid.appendChild(el);
+    grid.appendChild(box);
   }
 }
 
@@ -631,7 +498,7 @@ function renderMotos(appendOnly = false) {
   if (!grid) return;
 
   if (!appendOnly) {
-    grid.querySelectorAll(".catalog-card:not(.catalog-card--static), .catalog-empty, button.btn-card").forEach(el => el.remove());
+    grid.querySelectorAll(".catalog-card:not(.catalog-card--static), .catalog-empty, .catalog-empty-card, button.btn-card").forEach(el => el.remove());
   } else {
     const existingBtn = grid.querySelector("button.btn-card");
     if (existingBtn) existingBtn.remove();
@@ -672,7 +539,7 @@ function renderMotos(appendOnly = false) {
   motos.sort((a, b) => getMotoBucket(a) - getMotoBucket(b));
 
   if (motos.length === 0) {
-    if (!appendOnly) showEmpty(grid, "No hay motos disponibles en esta categoría.", true);
+    if (!appendOnly) showEmpty(grid, "No hay motos disponibles en el momento.", true, "motos");
     return;
   }
 
@@ -705,7 +572,7 @@ function renderCarros() {
   const carros = vehicles.filter(v => v.type === "carro" && v.purpose === "venta");
 
   if (carros.length === 0) {
-    showEmpty(grid, "No hay carros disponibles actualmente. ¡Vuelve pronto!");
+    showEmpty(grid, "No hay carros disponibles en el momento.", false, "carros");
     return;
   }
 
@@ -720,6 +587,10 @@ function renderOro() {
   grid.innerHTML = "";
   if (staticCard) grid.appendChild(staticCard);
 
+  if (goldItems.length === 0) {
+    showEmpty(grid, "No hay joyas de oro disponibles en el momento.", true, "joyas de oro");
+    return;
+  }
   goldItems.forEach(g => grid.appendChild(buildGoldCard(g)));
 }
 
@@ -732,7 +603,7 @@ function renderAlquiler() {
   const rentals = vehicles.filter(v => v.purpose === "alquiler");
 
   if (rentals.length === 0) {
-    showEmpty(grid, "No hay vehículos en alquiler disponibles en este momento.");
+    showEmpty(grid, "No hay vehículos en alquiler disponibles en el momento.", false, "vehículos en alquiler");
     return;
   }
 
@@ -800,7 +671,7 @@ function renderRepuestos() {
   grid.innerHTML = "";
 
   if (repuestosItems.length === 0) {
-    showEmpty(grid, "No hay repuestos ni accesorios disponibles en este momento. Escríbenos por WhatsApp.");
+    showEmpty(grid, "No hay repuestos ni accesorios disponibles en el momento.", false, "repuestos o accesorios");
     return;
   }
 
