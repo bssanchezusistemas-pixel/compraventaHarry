@@ -221,6 +221,7 @@ function mapProductToGold(product) {
     description: product.description || "",
     price: product.price || "",
     image: getPrimaryImage(product),
+    sub_items: m.sub_items || null,
   };
 }
 
@@ -392,13 +393,62 @@ function buildGoldCard(item) {
   }
 
   const lines = item.description ? item.description.split('\n').map(l => l.trim()).filter(Boolean) : [];
+
+  // Parse or retrieve sub_items (e.g. for Dijes or multi-item lots)
+  let subItems = item.sub_items;
+  if ((!subItems || !subItems.length) && lines.length > 2) {
+    const parsed = [];
+    lines.forEach(l => {
+      const match = l.match(/^([A-Za-zñÑáéíóúÁÉÍÓÚ\s]+?)[💲:]\s*([0-9,\.]+\s*(?:Gr|gr|g)?)\s*[📏·]\s*([0-9,\.]+\s*(?:Cm|cm|mm)?)\s*[🤑$·]\s*([0-9’'\.]+)/);
+      if (match) {
+        parsed.push({
+          name: match[1].trim(),
+          weight: match[2].trim() + (match[2].toLowerCase().includes('gr') || match[2].toLowerCase().includes('g') ? '' : ' Gr'),
+          length: match[3].trim(),
+          price: match[4].trim().startsWith('$') ? match[4].trim() : '$' + match[4].trim() + (match[4].length <= 4 ? '.000' : '')
+        });
+      }
+    });
+    if (parsed.length > 1) {
+      subItems = parsed;
+    }
+  }
+
+  const hasSubItems = Boolean(subItems && subItems.length > 0);
+  let subItemsHTML = '';
+  if (hasSubItems) {
+    subItemsHTML = `
+      <div class="gold-subitems-wrap">
+        <div class="gold-subitems-title">
+          <span>✨</span> Valores individuales por dije:
+        </div>
+        <div class="gold-subitems-list">
+          ${subItems.map(sub => `
+            <div class="gold-subitem-row">
+              <div class="gold-subitem-left">
+                <span class="gold-subitem-name">${sub.icon ? sub.icon + ' ' : ''}${sub.name}</span>
+                <span class="gold-subitem-spec">${sub.weight}${sub.length ? ' · ' + sub.length : ''}</span>
+              </div>
+              <span class="gold-subitem-price">${sub.price.startsWith('$') ? sub.price : '$' + sub.price}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
   const spec1 = item.karats || "Oro 18k";
   let spec2 = item.weight ? (item.weight + (item.length ? ` · ${item.length}` : '')) : '';
   if (!spec2) {
-    spec2 = lines[1] ? lines[1].replace(/[💲📏]/g, '').trim() : (lines[0] ? lines[0].replace(/[💲📏🇨🇴🇮🇹]/g, '').trim() : "Garantizado");
+    if (hasSubItems) {
+      spec2 = `${subItems.length} Dijes disponibles`;
+    } else {
+      spec2 = lines[1] ? lines[1].replace(/[💲📏]/g, '').trim() : (lines[0] ? lines[0].replace(/[💲📏🇨🇴🇮🇹]/g, '').trim() : "Garantizado");
+    }
   }
 
-  const formattedPrice = item.price ? (item.price.startsWith('$') ? item.price : '$' + item.price) : 'Consultar';
+  let formattedPrice = item.price ? (item.price.startsWith('$') || item.price.toLowerCase().startsWith('desde') ? item.price : '$' + item.price) : 'Consultar';
+  const priceLabel = hasSubItems ? 'Precios individuales' : 'Precio';
 
   const card = document.createElement("article");
   card.className = "catalog-card reveal active";
@@ -413,9 +463,10 @@ function buildGoldCard(item) {
         <span class="spec-badge">${spec1}</span>
         <span class="spec-badge">${spec2}</span>
       </div>
-      <div class="card-price-wrap">
-        <span class="price-label">Precio</span>
-        <span class="price-tag">${formattedPrice}</span>
+      ${subItemsHTML}
+      <div class="card-price-wrap" style="${hasSubItems ? 'margin-top: 0.5rem;' : ''}">
+        <span class="price-label">${priceLabel}</span>
+        <span class="price-tag" style="${hasSubItems ? 'font-size: 1.15rem;' : ''}">${formattedPrice}</span>
       </div>
       <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="btn-card">
         Consultar Disponibilidad
