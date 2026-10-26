@@ -42,7 +42,78 @@ const WHATSAPP_PHONE = "573127622440";
 // =========================================
 // LOCAL FALLBACK DATA
 // =========================================
-const LOCAL_VEHICLES = [];
+const LOCAL_VEHICLES = [
+  {
+    "id": "86cdcf9b-f1de-466c-b521-60baf35fc73c",
+    "name": "Nmax Versión 3",
+    "category": "yamaha-nmax",
+    "type": "moto",
+    "purpose": "venta",
+    "year": 2027,
+    "mileage": "0 Km",
+    "price": "$21’000.000",
+    "image": "/motos/nmax-v3-2027-1.webp",
+    "images": [
+      "/motos/nmax-v3-2027-1.webp"
+    ]
+  },
+  {
+    "id": "5fde2f1d-4547-4658-8030-9763fefc056c",
+    "name": "Nmax Versión 3",
+    "category": "yamaha-nmax",
+    "type": "moto",
+    "purpose": "venta",
+    "year": 2027,
+    "mileage": "0 Km",
+    "price": "$22’500.000",
+    "image": "/motos/nmax-v3-2027-2.webp",
+    "images": [
+      "/motos/nmax-v3-2027-2.webp"
+    ]
+  },
+  {
+    "id": "6f8e758a-464d-4880-bde2-93a6f5ad88b2",
+    "name": "Nmax Versión 3",
+    "category": "yamaha-nmax",
+    "type": "moto",
+    "purpose": "venta",
+    "year": 2027,
+    "mileage": "0 Km",
+    "price": "$22’500.000",
+    "image": "/motos/nmax-v3-2027-3.webp",
+    "images": [
+      "/motos/nmax-v3-2027-3.webp"
+    ]
+  },
+  {
+    "id": "a814913f-4d76-45d6-9a6b-bdd97d666626",
+    "name": "Nmax Versión 3",
+    "category": "yamaha-nmax",
+    "type": "moto",
+    "purpose": "venta",
+    "year": 2027,
+    "mileage": "0 Km",
+    "price": "$22’500.000",
+    "image": "/motos/nmax-v3-2027-4.webp",
+    "images": [
+      "/motos/nmax-v3-2027-4.webp"
+    ]
+  },
+  {
+    "id": "31d13744-8666-403d-89b1-289e52d06bec",
+    "name": "Nmax Versión 3",
+    "category": "yamaha-nmax",
+    "type": "moto",
+    "purpose": "venta",
+    "year": 2027,
+    "mileage": "0 Km",
+    "price": "$22’500.000",
+    "image": "/motos/nmax-v3-2027-5.webp",
+    "images": [
+      "/motos/nmax-v3-2027-5.webp"
+    ]
+  }
+];
 
 const LOCAL_TRAMITES = [
   {
