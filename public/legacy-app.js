@@ -206,7 +206,181 @@ const LOCAL_EXCHANGE_RATES = [
   }
 ];
 
-const LOCAL_GOLD = [];
+const LOCAL_GOLD = [
+  {
+    "id": "818f9471-b6a6-43e0-95f9-444b36e634f3",
+    "name": "Dijes Oro🇨🇴 (Individuales)",
+    "karats": "Oro 18k",
+    "weight": "",
+    "length": "",
+    "origin": "Colombia",
+    "description": "Dijes Oro🇨🇴:\nCruz💲0,90 Gr📏4 Cm🤑360.000\nOso💲4,72 Gr📏3 Cm🤑1’880.000\nCruz💲4,75 Gr📏4 Cm🤑1’900.000\nVirgen💲6,56 Gr📏4 Cm🤑2’600.000",
+    "price": "$360.000 - $2’600.000",
+    "image": "https://compraventa-harry.vercel.app/oro/oro-10.webp",
+    "sub_items": [
+      {
+        "icon": "✝️",
+        "name": "Cruz",
+        "price": "$360.000",
+        "length": "4 Cm",
+        "weight": "0,90 Gr"
+      },
+      {
+        "icon": "🧸",
+        "name": "Oso",
+        "price": "$1’880.000",
+        "length": "3 Cm",
+        "weight": "4,72 Gr"
+      },
+      {
+        "icon": "✝️",
+        "name": "Cruz",
+        "price": "$1’900.000",
+        "length": "4 Cm",
+        "weight": "4,75 Gr"
+      },
+      {
+        "icon": "🙏",
+        "name": "Virgen",
+        "price": "$2’600.000",
+        "length": "4 Cm",
+        "weight": "6,56 Gr"
+      }
+    ]
+  },
+  {
+    "id": "8b476e2a-bcbd-4e68-8558-63d376e5b3a7",
+    "name": "Cadena Oro🇮🇹 Militar Diamantada",
+    "karats": "Oro 18k",
+    "weight": "24,90 Gr",
+    "length": "72 Cm",
+    "origin": "Italia",
+    "description": "Cadena Oro🇮🇹 Militar Diamantada\n💲24,90 Gr📏72 Cm",
+    "price": "9’900.000",
+    "image": "https://compraventa-harry.vercel.app/oro/oro-9.webp",
+    "sub_items": null
+  },
+  {
+    "id": "35317c5c-fb6d-47bc-a1e2-a5f34c51fa0a",
+    "name": "Cadena Oro🇨🇴 Rústica",
+    "karats": "Oro 18k",
+    "weight": "22,24 Gr",
+    "length": "63 Cm",
+    "origin": "Colombia",
+    "description": "Cadena Oro🇨🇴 Rustica\n💲22,24 Gr📏63 Cm",
+    "price": "8’900.000",
+    "image": "https://compraventa-harry.vercel.app/oro/oro-8.webp",
+    "sub_items": null
+  },
+  {
+    "id": "99868d53-3e0e-4f33-8a95-33bee16bb68d",
+    "name": "Cadena Oro🇮🇹 Gucci Diamantado",
+    "karats": "Oro 18k",
+    "weight": "13,83 Gr",
+    "length": "61 Cm",
+    "origin": "Italia",
+    "description": "Cadena Oro🇮🇹 Gucci Diamantado\n💲13,83 Gr📏61 Cm",
+    "price": "5’500.000",
+    "image": "https://compraventa-harry.vercel.app/oro/oro-7.webp",
+    "sub_items": null
+  },
+  {
+    "id": "1afe3338-d28c-4061-a325-32073fc3736c",
+    "name": "Cadena Oro🇨🇴 Dubai",
+    "karats": "Oro 18k",
+    "weight": "12,62 Gr",
+    "length": "61 Cm",
+    "origin": "Colombia",
+    "description": "Cadena Oro🇨🇴 Dubai\n💲12,62 Gr📏61 Cm",
+    "price": "5’000.000",
+    "image": "https://compraventa-harry.vercel.app/oro/oro-6.webp",
+    "sub_items": null
+  },
+  {
+    "id": "e0b11f99-5c5a-40e7-9da8-3b6698de796a",
+    "name": "Cadena Oro🇨🇴 Rústica",
+    "karats": "Oro 18k",
+    "weight": "12,32 Gr",
+    "length": "60 Cm",
+    "origin": "Colombia",
+    "description": "Cadena Oro🇨🇴 Rustica\n💲12,32 Gr📏60 Cm",
+    "price": "4’900.000",
+    "image": "https://compraventa-harry.vercel.app/oro/oro-5.webp",
+    "sub_items": null
+  },
+  {
+    "id": "6ccc6b65-1933-4fe8-8db6-19fcebb40589",
+    "name": "Pulsera Oro🇨🇴 Van Cleef",
+    "karats": "Oro 18k",
+    "weight": "9 Gr",
+    "length": "19 Cm",
+    "origin": "Colombia",
+    "description": "Pulsera Oro🇨🇴 Van Cleef\n💲9 Gr📏19 Cm",
+    "price": "3’600.000",
+    "image": "https://compraventa-harry.vercel.app/oro/oro-4.webp",
+    "sub_items": null
+  },
+  {
+    "id": "03989b3d-a1f4-40f9-9829-b6a344760ece",
+    "name": "Tobillera Oro🇨🇴 Rústica",
+    "karats": "Oro 18k",
+    "weight": "7,57 Gr",
+    "length": "28,5 Cm",
+    "origin": "Colombia",
+    "description": "Tobillera Oro🇨🇴 Rustica\n💲7,57 Gr📏28,5 Cm",
+    "price": "3’000.000",
+    "image": "https://compraventa-harry.vercel.app/oro/oro-3.webp",
+    "sub_items": null
+  },
+  {
+    "id": "12b08205-e6e5-4d65-bb53-fe1632bea08c",
+    "name": "Pulsera Oro🇮🇹 Escalera",
+    "karats": "Oro 18k",
+    "weight": "7,60 Gr",
+    "length": "21,5 Cm",
+    "origin": "Italia",
+    "description": "Pulsera Oro🇮🇹 Escalera\n💲7,60 Gr📏21,5 Cm",
+    "price": "3’000.000",
+    "image": "https://compraventa-harry.vercel.app/oro/oro-11.webp",
+    "sub_items": null
+  },
+  {
+    "id": "df1f879a-e7e3-48e1-a76e-ddd11dca8fd2",
+    "name": "Pulsera Oro🇨🇴 Rústica",
+    "karats": "Oro 18k",
+    "weight": "4,90 Gr",
+    "length": "20 Cm",
+    "origin": "Colombia",
+    "description": "Pulsera Oro🇨🇴 Rustica\n💲4,90 Gr📏20 Cm",
+    "price": "1’900.000",
+    "image": "https://compraventa-harry.vercel.app/oro/oro-1.webp",
+    "sub_items": null
+  },
+  {
+    "id": "fcb5a3a7-3209-43df-a1c9-ece9b2b93bae",
+    "name": "Pulsera Oro🇮🇹 Rústica",
+    "karats": "Oro 18k",
+    "weight": "3,84 Gr",
+    "length": "20 Cm",
+    "origin": "Italia",
+    "description": "Pulsera Oro🇮🇹 Rústica\n💲3,84 Gr📏20 Cm",
+    "price": "1’500.000",
+    "image": "https://compraventa-harry.vercel.app/oro/oro-12.webp",
+    "sub_items": null
+  },
+  {
+    "id": "a8fc9558-47bd-4d6f-b55d-81c5a15df441",
+    "name": "Tobillera Oro🇨🇴 Gucci",
+    "karats": "Oro 18k",
+    "weight": "4,83 Gr",
+    "length": "27,5 Cm",
+    "origin": "Colombia",
+    "description": "Tobillera Oro🇨🇴 Gucci\n💲4,83 Gr📏27,5 Cm",
+    "price": "1’900.000",
+    "image": "https://compraventa-harry.vercel.app/oro/oro-2.webp",
+    "sub_items": null
+  }
+];
 
 // Runtime stores
 let vehicles = [];
