@@ -29,6 +29,12 @@ export function getCdnImageUrl(
     return trimmed;
   }
 
+  // If already an optimized WebP or from cv-product-images, serve directly
+  // This avoids Vercel 402 OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED when monthly limit is reached
+  if (trimmed.endsWith(".webp") || trimmed.includes("/cv-product-images/")) {
+    return trimmed;
+  }
+
   // Detect Supabase public storage URLs
   if (trimmed.includes(".supabase.co/storage/v1/object/public/")) {
     return `/_next/image?url=${encodeURIComponent(trimmed)}&w=${width}&q=${quality}`;

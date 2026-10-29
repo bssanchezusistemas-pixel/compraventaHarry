@@ -410,6 +410,8 @@ function getVercelCdnImageUrl(url, width = 640, quality = 75) {
   const trimmed = url.trim();
   if (!trimmed || trimmed.startsWith("data:") || trimmed.startsWith("blob:")) return trimmed;
   if (trimmed.startsWith("/_next/image")) return trimmed;
+  if (trimmed.endsWith(".webp") || trimmed.includes("/cv-product-images/")) return trimmed;
+  if (trimmed.endsWith(".webp") || trimmed.includes("/cv-product-images/")) return trimmed;
   if (trimmed.includes(".supabase.co/storage/v1/object/public/")) {
     return `/_next/image?url=${encodeURIComponent(trimmed)}&w=${width}&q=${quality}`;
   }
@@ -632,7 +634,7 @@ function buildGoldCard(item) {
 
   let imgHTML = '';
   if (item.image) {
-    imgHTML = `<img src="${item.image}" alt="${item.name}" loading="lazy">`;
+    imgHTML = `<img src="${item.image}" alt="${item.name}" loading="lazy" onerror="if(this.src.indexOf('/_next/image?url=')!==-1){const m=this.src.match(/url=([^&]+)/);if(m)this.src=decodeURIComponent(m[1]);}">`;
   } else {
     imgHTML = `<div class="card-img-placeholder"><span>🪙</span><p>Fotos por WhatsApp</p></div>`;
   }
@@ -782,7 +784,7 @@ function buildRepuestoCard(item) {
       <div class="slider-dots">${dots}</div>
     `;
   } else if (item.image) {
-    imgHTML = `<img src="${item.image}" alt="${item.name}" loading="lazy">`;
+    imgHTML = `<img src="${item.image}" alt="${item.name}" loading="lazy" onerror="if(this.src.includes('/_next/image?url=')){const m=this.src.match(/url=([^&]+)/);if(m)this.src=decodeURIComponent(m[1]);}">`;
   } else {
     imgHTML = `<div class="card-img-placeholder"><span>🔧</span><p>Sin imagen</p></div>`;
   }

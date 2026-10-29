@@ -24,7 +24,7 @@ function dispatchDomContentLoadedIfReady() {
 export default function LegacyHomeScripts() {
   return (
     <Script
-      src="/legacy-app.js?v=20261020-v3"
+      src="/legacy-app.js?v=20261028-directwebp"
       strategy="afterInteractive"
       onLoad={dispatchDomContentLoadedIfReady}
     />
